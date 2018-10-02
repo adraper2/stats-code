@@ -1,0 +1,126 @@
+---
+title: "MTH 341 - HW2"
+author: "Aidan Draper"
+date: "9/10/2018"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 2
+
+Page 74 - #3, 6, 8, 11, 13 (part a only)
+
+#### Question 3:
+According to the CDC (Center for Disease Control and Prevention), men who smoke are 23 times more likely to develop lung cancer than men who don't smoke. Also according to the CDC, 21.6% of men in the US smoke. What is the probability that a man in the U.S. is a smoker, given that he develops lung cancer?
+
+
+<i> Let L be the event that a man develops lung cancer; Let S be the event that a man is a smoker.</br>
+$P(S) = 0.216$</br>
+$P(S^{c}) = 0.784$</br>
+$\frac{ P(L|S)} {P(L|S^{c})} = \frac{23}{1} = 1.0$
+
+We want to solve $P(S|L) = \frac{P(L|S)P(S)}{P(L|S)P(S) + P(L|S^{c})P(S^{c})}$
+</i>
+```{r q3}
+prob.S <- 0.216
+prob.Sc <- 1 - prob.S
+
+percent.of <- 1/24
+
+prob.L_S <- 23*percent.of
+prob.L_Sc <- 1* percent.of
+cat("Do they equal one?", prob.L_S + prob.L_Sc) # verify its equal to 1
+
+prob.S_L <- (prob.L_S * prob.S) / ((prob.L_S * prob.S) + (prob.L_Sc * prob.Sc))
+cat("The probability that a man in the U.S. is a smoker given that he develops lung cancer is:", prob.S_L)
+```
+
+#### Question 6:
+A hat contains 100 coins, where 99 are fair but one is double-headed (always landing Heads). A coin is chosen uniformly at random. The chosen coin is flipped 7 times, and it lands Heads all 7 times. Given this information, what is the probability that the chosen coin is double-headed? (Of course, another approach here would be to look at both sides of the coin - but this is a metaphorical coin.)
+
+<i>Let F be the event that a fair coin is picked; Let H be the event that the coin lands heads 7 times</br>
+$P(F) = .99$</br>
+$P(F^{c}) = .01$</br>
+
+$P(H|F) = (\frac{1}{2})^7$</br>
+$P(H|F^{c}) = 1$</br>
+
+Given that we have all of this information, we can just use Bayes' rule to plug in our values and solve for $P(F^{c}|H)$:
+</i>
+```{r q6}
+prob.F <- .99
+prob.Fc <- 1 - prob.F
+prob.H_F <- 1/2 ** 7
+prob.H_Fc <- 1
+
+prob.Fc_H <- (prob.H_Fc * prob.Fc) / ((prob.H_Fc * prob.Fc) + (prob.H_F * prob.F))
+cat("The probability of selecting the double-headed coin is:", prob.Fc_H)
+```
+
+#### Question 8:
+The screens used for a certain type of cell phone are manufactured by 3 companies, A, B, and C. The proportions of screens supplied by A, B, and C are 0.5, 0.3, and 0.2, respectively, and their screens are defective with probabilities 0.01, 0.02, and 0.03, respectively. Given that the screen on such a phone is defective, what is the probability that Company A manufactured it?
+
+<i> Let A be the event the company A manufactured the screen;  Let B be the event the company B manufactured the screen; Let C be the event the company C manufactured the screen; Let D be the event that the screen is defective
+
+$P(A) = 0.5$</br>
+$P(B) = 0.3$</br>
+$P(C) = 0.2$</br>
+
+$P(D|A) = 0.01$</br>
+$P(D|B) = 0.02$</br>
+$P(D|C) = 0.03$</br>
+
+Because $A^{c} = B +C$, $P(A|D)$ can be solved using Bayes' rule by using B and C as A's compliment. Therefore, Bayes' rule can be transformed as so,
+$P(A|D) = \frac{P(A \cap D)}{P(D)} = \frac{P(D|A)P(A)}{P(D|A)P(A) + P(D|A^{c})P(A^{c})} = \frac{P(D|A)P(A)}{P(D|A)P(A) + P(D|B)P(B) + P(D|C)P(C)}$
+</i>
+```{r q8}
+prob.A <- 0.5
+prob.B <- 0.3
+prob.C <- 0.2
+
+prob.D_A <- 0.01
+prob.D_B <- 0.02
+prob.D_C <- 0.03
+
+prob.A_D <- (prob.D_A * prob.A) / ((prob.D_A * prob.A) + (prob.D_B * prob.B)+ (prob.D_C * prob.C))
+cat("The probability is:", prob.A_D)
+```
+
+#### Question 11:
+An exit poll in an election is a survey taken of voters just after they have voted. One major use of exit polls has been so that news organizations can try to figure out as soon as possible who won the election, before the votes are officially counted. This has been notoriously inaccurate in various elections, sometimes because of selection bias: the sample of people who are invited to and agree to participate in the survey may not be similar enough to the overall population of voters.</br>
+Consider an election with two candidates, Candidate A and Candidate B. Every voter is invited to participate in an exit poll, where they are asked whom they voted for; some accept and some refuse. For a randomly selected voter, let A be the event that they voted for A, and W be the event that they are willing to participate in the exit poll. Suppose that $P(W|A)$ = 0.7 but $P(W|A^{c})$ = 0.3. In the exit poll, 60% of the respondents say they voted for $A$ (assume they are all honest), suggesting a comfortable victory for $A$. Find $P(A)$, the turn proportion of people who voted for $A$.
+
+<i>$P(A|W) = 0.6$, which means $P(A^{c}|W) = 0.4$. If we want to find $P(A)$, we can use simple algebra to manipulate the odd form of Bayes' rule and solve for the prior, $\frac {P(A)}{P(A^{c})}$, instead of $P(W|A)$. So, if $\frac{P(A|W)}{P(A^{c}|W)} = \frac{P(W|A)}{P(W|A^{c})} \frac {P(A)}{P(A^{c})}$, then $\frac{0.6}{0.4} = \frac{0.7}{0.3} \frac {P(A)}{P(A^{c})}$. We can now solve for the prior fraction, which we can find the probabilities for because we know that the sum of both numbers must equal 1. The rest of the math can be found in the R code below. </i>
+```{r q11}
+poll.responses <- 0.6/0.4
+willingness <- 0.7/0.3
+prior <- poll.responses / willingness
+cat("Prior is:", prior, "but now we need the numerator, P(A)")
+
+```
+Now, using algebra, we can solve for $P(A)$ with the information we have: 0.6428571 = $\frac {P(A)}{P(A^{c})}$ and $P(A) + P(A^{c}) = 1$. By setting $P(A) = 0.6428571 * P(A^{c})$, we can replace P(A) in the other formula to get $1 = P(A^{c}) + (0.6428571 * P(A^{c}))$. Solving for $P(A^{c})$ gets us 0.6086957. Finally, $P(A) = 1 - P(A^{c})$ = <b>0.3913043</b>
+ 
+ 
+#### Question 13a:
+Company A has just developed a diagnostic test for a certain disease. The disease afflicts 1% of the population. As defined in Example 2.3.9, the sensitivity of the test is the probability of someone testing positive, given that they have the disease, and the specificity of the test is the probability of someone testing negative, given that they don't have the disease. Assume that, as in Example 2.3.9, the sensitivity and specificity are both 0.95.</br>
+Company B, which is a rival of Company A, offers a competing test for the disease. Company B claims that their test is faster and less expensive to perform than Company A's test, is less painful (Company A's test requires an incision), and yet has a higher overall success rate, where overall success rate is defined as the probability that a random person gets diagnosed correctly.</br>
+(a) It turns out that Company B's test can be described and performed very simple: no matter who the patient is, diagnose that they do not have the disease. Check whether Company B's claim about overall success rate is true.
+
+<i>Let D be the event that someone has the disease; Let T be the event that a test comes back as positive. We know $P(D) = 0.01$ and $P(D^{c}) = 0.99$. We also know that $P(T|D) = 0.95$ and $P(T^{c}|D^{c}) = 0.95$ for company A. We know that, for company B, $P(T|D) = 0$ and $P(T^c|D^c) = 1$ because the test only comes back as negative. Both companies probabilities of success can be calculated as $P(success) = P(T|D) P(D)  + P(T^c|D^{c}) P(D^c)$ using Law of Total Probability.
+</i>
+```{r q13a}
+p.success.a <- (0.95 * 0.01) + (0.95 * 0.99)
+p.success.b <- (0 * 0.01) + (1*0.99)
+if (p.success.b>p.success.a){
+  cat("Company B's success is greater than Company A:", p.success.b, ">", p.success.a)
+} else if (p.success.b<p.success.a){
+  cat("Company A's success is greater than Company B:", p.success.a, ">", p.success.b)
+} else {
+  cat("Companies A and B have the same success rate:", p.success.b)
+}
+```
+<b>Note:</b> I realize after solving this that a better event than T would be S, for successful test diagnostic, and that way I can correctly use LOTP with $P(S|D)$ and $P(S|D^C)$. Next time, I will take that approach.

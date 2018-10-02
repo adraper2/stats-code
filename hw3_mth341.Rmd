@@ -1,0 +1,112 @@
+---
+title: "MTH 341 - HW3"
+author: "Aidan Draper"
+date: "9/18/2018"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 3
+
+Page 128, #1, 7, 8, 14, 17, 19, 23, 24, 26
+
+#### Question 1:
+People are arriving at a party one at a time. While waiting for more people to arrive they entertain themselves by comparing their birthdays. Let $X$ be the number of people needed to obtain a birthday match, i.e., before person $X$ arrives there are no two people with the same birthday, but when person $X$ arrives there is a match. Find the PMF of $X$.
+
+<i>Let X be the number of people in the room when there is finally a birthday match. $k$ is the number of people in the room. If there are just two people in the room,  $P(X=2) = \frac {1}{365}$ because there are two people and only one birthday option. However, if you need to select a third person, there now have to be two birthdays, one unique one and another that is shared. However, $P(X=3)$ is not simply $\frac {2}{365}$ because you must disclude the probability that the first event, $P(X=2)$ had a match. Therefore, $P(X=3) = (1 - P(X=2)) * \frac{2}{365}$. If we generalize this formula, we get $P(X = k) = (1 - P(X= k-1)) * \frac{k-1}{365}$.
+</i>
+
+#### Question 7:
+Bob is playing a video game that has 7 levels. He starts at level 1, and has probability $p_1$ of reaching level 2. In general, given that he reaches level $j$, he has probability $p_j$ of reaching level $j$ + 1, for $1\leq j \leq 6$. Let $X$ be the highest level that he reaches. Find the PMF of $X$ (in terms of $p_1, ...,p_6$).
+
+<i>Let X be the highest level the person reaches. We know that $P(X\geq2) = p_1$, $P(X\geq3) = p_1p_2$, $P(X\geq4) = p_1p_2p_3$, and so on. However, to find $P(X=jth$ level$)$, you have to subtract all the people who got past that current level, which is $P(X\geq j+1)$. Therefore, the equation generalizes to $P(X=j) = P(X\geq j) -P(X\geq j+1)$. For example, the highest level reached being 3 would be $P(X=3) = P(X\geq 3) -P(X\geq 4) = p_1p_2-p_1p_2p_3$.
+</i>
+
+#### Question 8:
+There are 100 prizes, with one worth 1 dollar, one worth 2 dollars, ..., and one worth 100 dollars. There are 100 boxes, each of which contains one of the prizes. You get 5 prizes by picking random boxes one at a time, <i>without replacement</i>. Find the PMF of how much your most valuable prize is worth (as a simple expression in terms of binomial coefficients).
+
+<i> Since we are picking 5 boxes, the worst hand we could get is 1, 2, 3, 4 and 5 dollars. This also means that our lowest possible "valuable prize" is 5 dollars and there is only one possibility of this happening. As a result, our bounds our $k$ is $5 \leq k\leq100$ and the possibility of getting 5 dollars as our biggest number is 1 / our total number of possibilities. Our total number of possibilities are ${100 \choose 5}$, but we have to include the fact that we only care about the largest number and our still picking four others. If our largest number is 100, we have ${100-1 \choose4}$ options for the other four numbers. Therefore, the possibilities that form the distribution that falls under our current largest number, $k$ can be generalized as ${k-1 \choose 4}$, which makes our final formula $\frac{k-1 \choose 4}{100 \choose 5}$ because we are picking all the possibilities of four numbers that are less than our largest number, $k$, in the set 5 to 100.
+</i>
+```{r q8}
+k <- 5:100
+pmf.valuable <- choose(k-1,4) / choose(100,5)
+#This following summation should equal 1
+cat("Our distribution of the PMF of how much our most valuable prize is worth is equal to: ", sum(pmf.valuable))
+```
+
+#### Question 14:
+Let $X$ be the number of purchases that Fred will make on the online site for a certain company (in some specified time period). Suppose that the PMF of $X$ is $P(X=k)=e^{-\lambda} \lambda^k/k!$ for $k$ = 0,1,2, .... This distribution is called the <i>Poisson distribution</i> with parameter $\lambda$, and it will be studied extensively in later chapters. 
+<br><br>
+
+(a) Find $P(X\geq1)$ and $P(X\geq2)$ without summing infinite series.
+
+Instead of summing infinite series. We can find $P(X \lt 1)$ and $P(X \lt 2)$ and then subract 1 from each because we now for the entire set k, the sum of the whole probability mass function of X is 1. The only number in the set of k that is less than one is $P(X=0)$ so the answer for $P(X\geq1)$ is $1-P(X=0)= 1 - (e^{-\lambda} \lambda^0/0!) = 1 - e^{-\lambda}$. Now, $P(X\geq2)$ is just $1 - (P(X=0) + P(X=1))$, which is equivalent to our final answer: $1 - (e^{-\lambda} + \lambda e^{-\lambda})$.
+
+
+(b) Suppose that the company only knows about people who have made at least one purchase on their site (a user sets up an account to make a purchase, but someone who has never made a purchase there doesn't appear in the customer database). If the company computes the number of purchases for everyone in their database, then these data are draws from the <i>conditional</i> distribution of the number of purchases, given that at least one purchase is made. Find the conditional PMF of $X$ given $X\geq1$. (This conditional distribution is called a <i>truncated Poisson distribution</i>.)
+<br><br>
+<i>We are trying to solve $P(X=k|1-P(X=0))$, which is equal to $\frac {P(1-P(X=0|X=k)))P(X = k)}{1-P(X=0)}$ using Bayes' rule. $P(1-P(X=0|X=k)))$ is just 1 because we know that it occurs given $P(X=k)$. Therefore, the formula simplifies to $\frac {P(X = k)}{1-P(X=0)}$. Now, we can just plug in both equations from before to get $\frac {e^{-\lambda} \lambda^k}{k!}\frac{1}{1 - e^{-\lambda}}$, which simplies to $\frac {e^{-\lambda} \lambda^k}{k!(1 - e^{-\lambda})}$, our final answer.</i>
+
+ 
+#### Question 17:
+An airline overbooks a flight, selling more tickets for the flight than there are seats on the plane (figuring that it's likely that some people won't show up). The plane has 100 seats, and 110 people have booked the flight. Each person will show up for the flight with probability 0.9, independently. Find the probability that there will be enough seats for everyone who shows up for the flight.
+
+<i> This problem is $X \sim Bin(110,.9)$ where p is the probability that someone shows up and n is the number of total people booked. If we care about at most 100 people showing up (so that we know, no matter who doesn't show up, the people who show up get 1 of the 100 seats), then our interval for $k$ is $1\leq k \leq 100$. Then, we can set up our PMF as a regular Binomial PMF as shown below.
+</i>
+```{r q17}
+k <- 1:100
+all.seats <- choose(110,k) * .9^k * (1-.9)^(110-k)
+cat("The probability of everyone getting a seat is:", sum(all.seats))
+```
+
+#### Question 19:
+In a chess tournament, $n$ games are being played, independently. Each game ends in a win for one player with probability 0.4 and ends in a draw (tie) with probability 0.6. Find the PMFs of the number of games ending in a draw, and of the number of players whose games end in draws.
+
+<i>$X \sim Bin(n,0.6)$. Then, PMF of X is `choose(n, k) * p ^(k) * (1-p)^(n-k)` where p is the probability of a tie, 0.6.
+<br>Then, the number of people who tied is $P(Y = 2k)$ because for every tie result their our 2 people, $k$, which is equivalent to `choose(n, 2k) * p ^(2k) * (1-p)^(n-2k)` where p is the probability of a tie, 0.6.
+</i>
+
+
+#### Question 23:
+There are $n$ people eligible to vote in a certain election. Voting requires registration. Decisions are made independently. Each of the $n$ people will register with probability $p_1$. Given that a person registers, he or she will vote with probability $p_2$. Given that a person registers, he or she will vote for Kodos (who is one of the candidates) with probability $p_3$. What is the distribution of the number of votes for Kodos (give the PMF, fully simplified, or the name of the distribution, including its parameters)? 
+
+<i>Let $R$ be the event that the person registered, let $V$ be the event that the person voted and let $K$ represent the people who vote Kodos. $P(R) = p_1$, $P(V|R) = p_2$, and $P(K|V,R) = p_3$. Because the event K is dependent on the person registering and voting, $p_1$ and $p_2$ have to happen, which means that the overall probability, or $P($Vote for Kodos$)$ is just $P(R)*P(V|R) *P(K|V,R)= p_1 * p_2 * p_3$.
+</i>
+
+
+#### Question 24:
+Let $X$ be the number of Heads in 10 fair coin tosses.
+<br><br>
+(a) Find the conditional PMF of $X$, given that the first two tosses both land Heads.
+
+<i>Let $X \sim Bin(10, 1/2)$. We are attempting to solve $P(X = k | first two heads)$ for k: 2,...,10. 
+</i>
+```{r q24a}
+k <- 2:10
+pmf.twoheads <- (choose(8, k-2) * .5^(k-2) * .5^(10-k))
+plot(pmf.twoheads)
+cat("The sum of the PMF should equal 1:", sum(pmf.twoheads))
+```
+<br><br>
+(b) Find the conditional PMF of $X$, given that at least two tosses land Heads.
+
+<i>
+Bayes' rule: $P(X=k|k\geq 2) = \frac {P(k \geq 2|X=k) P(X=k)}{P(k \geq 2)}$ where $P(k \geq 2)$ is just equivalent to $1 -P(k =0) - P(k=1)$. So, $P(X=k|k\geq 2)$ is equivalent to$\frac {P(k \geq 2|X=k) P(X=k)}{1 -(P(k =0) + P(k=1))}$. $P(k \geq 2|X=k)$ is actually just 1 because you know $X$ is greater than or equal 2 already given that X is some coin toss between 2 and 10. Therefore, our final formula simplifies to $\frac{ P(X=k)}{1 -(P(k =0) + P(k=1))}$, which you can solve by plugging in the general Binomial PMF for each scenario using $X \sim Bin(10, 1/2)$ for k. This is done below and validated.
+</i>
+```{r q24b}
+k <- 2:10
+pmf.geq2 <- (choose(10, k) * .5^(k) * .5^(10-k)) / (1 - ((choose(10, 0) * .5^(0) * .5^(10)) + (choose(10, 1) * .5^(1) * .5^(9))))
+plot(pmf.geq2)
+cat("The sum of the PMF is:", sum(pmf.geq2))
+pmf.geq2
+```
+
+#### Question 26:
+If $X\sim HGeom(w,b,n)$, what is the distribution of $n-X$? Give a short proof.
+
+<i>$X\sim HGeom(w,b,n)$ has a general formula: $P(X=k) = \frac{{w \choose k}{b \choose n-k}}{w+b\choose n}$. Now, we want the distribution for $n - X ~ HGeom(?)$, which would mean we want $P(n-X=k)$, or an easier interpretation, $P(X=n-k)$. Using this convention where $n-k$ represents the regular set $k$, we can plug $n-k$ into the origional formula wherever $k$ is. This gives us $P(X=n-k) = \frac{{w \choose n-k}{b \choose n-(n-k)}}{w+b\choose n}=\frac{{w \choose n-k}{b \choose k}}{w+b\choose n}$. Essentially, we have just switched our binomial selection of $w$ and $b$ for $k$ and $n-k$. Therefore, our distribution is just $n-X\sim$ HGeom$(b,w,n)$.
+</i>

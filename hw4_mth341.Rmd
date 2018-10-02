@@ -1,0 +1,64 @@
+---
+title: "MTH 341 - HW4"
+author: "Aidan Draper"
+date: "9/30/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 3
+
+Page 128, #3, 4, 5, 6, 15
+
+#### Question 3:
+Let $X$ be an r.v. with CDF $F$ and $Y=\mu+\sigma X$, where $\mu$ and $\sigma$ are real numbers with $\sigma > 0$. (Then $Y$ is called a <i> location-scale transformation</i> of $X$; we still encounter this concept many times in Chapter 5 and beyond.) Find the CDF of $Y$, in terms of $F$. 
+
+<i>Answer goes here
+</i>
+```{r q3}
+# code goes here
+```
+
+
+#### Question 4:
+Let $n$ be a positive integer and $F(x)=\frac{\lfloor x \rfloor}{n}$ for $0 \leq x \leq n$, $F(x)= 0$ for $x < 0$, and $F(x)=1$ for $x>n$, where $\lfloor x \rfloor$ is the greatest integer less than or equal to $x$. Show that $F$ is a CDF, and find the PMF that is corresponds to. 
+
+<i>Answer goes here
+</i>
+```{r q4}
+# code goes here
+```
+
+
+#### Question 5:
+(a) Show that $p(n)=(\frac{1}{2})^{n+1}$ for $n=0,1,2,...$ is a valid PMF for a discrete r.v.
+
+(b) Find the CDF for a random variable with the PMF from (a).
+
+<i>Answer goes here
+</i>
+```{r q5}
+# code goes here
+```
+
+#### Question 6:
+<i>Benford's law</i> states that in a very large variety of real-life data sets, the first digit approximately follows a particular distribution with about a 30% chance of a 1, and 18% chance of 2 and in general $P(D=j) = log_{10}(\frac{j+1}{j})$, for $j\in \{1,2,3,...,9 \}$, where $D$ is the first digit of a randomly chosen element. Check that this is a valid PMF (using properties of logs, not with a calculator).
+
+<i>Answer goes here
+</i>
+```{r q6}
+# code goes here
+```
+ 
+#### Question 15:
+Find the CDF of an r.v. $X \sim DUnif(1,2,...,n)$.
+
+<i>Answer goes here
+</i>
+```{r q15}
+# code goes here
+```
+

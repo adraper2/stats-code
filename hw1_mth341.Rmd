@@ -1,0 +1,126 @@
+---
+title: "MTH 341 - HW1"
+author: "Aidan Draper"
+date: "9/4/2018"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 1
+
+Page 31 - 1, 2, 6, 33, 34, 42, 47
+
+#### Question 1:
+How many ways are there to permutate the word MISSISSIPPI?
+
+<i>There are 11 letters so it would be 11!, but I have to remove permutations of duplicate letters (4 Ss, 4 Is, and 2 Ps) so:</i>
+```{r q1}
+total <- factorial(11)
+s.dup <- factorial(4)
+i.dup <- factorial(4)
+p.dup <- factorial(2)
+final.num <- total/(s.dup*i.dup*p.dup)
+cat("Number of permutations:",final.num)
+```
+
+#### Question 2:
+
+##### a). 
+How many 7-digit phone numbers are possible assuming that the first digit can't be a 0 or a 1?
+
+<i>There are 10^7 options at first, but then, I need to account for the lack of options in the first number of the phone so:</i>
+```{r q2b}
+ans2a <- (8)*(10^6)
+cat("Number of phone numbers:",ans2a)
+```
+
+##### b).
+Re-solve (a), except now assume also that the phone number is not allowed to start with 911.
+
+<i>I figured this problem out by taking our last number and then subtracting option that would fall under a number that started with '911'. All numbers would be 10^7, but we only get to pick the 4 last numbers so we subtract the 10^4 possibilities that would follow a '911' 7-digit number.</i>
+```{r q2a}
+#ans2b <- 7*(9^2)*10^4 # this is wrong
+ans2b <- ans2a - 10^4 # subtract the possibilities following "911"
+cat("Number of phone numbers:",ans2b)
+```
+
+#### Question 6:
+How many possibilities are there for how 20 chess club players are matched up, assuming that in each game it does matter who has white peices?
+
+<i>If I walked into a room that had 20 people playing chess and they could be using either a black or white set of chess pieces, then I would also be worried about the order that the players were in but not all of the pairs ordered together. Therefore, the inital total would be 20!. However, this would be overcounting the order between pairs, which we do not care about so we divide by `factorial(num of pairs)`:</i>
+```{r q6}
+total <- factorial(20)
+overcounting <- factorial(10) # we have to adjust for overcounting, which would be considering the order of tables of chess players
+ans6 <- total/overcounting
+cat("Number of combinations:", ans6)
+```
+
+#### Question 33:
+A random 13-card hand is dealt from a deck; what is the probability that that hand contains at least three of every suit?
+
+<i>You have a total of 635,013,559,600 possibilities because I are choosing an unordered 13 card hand from 52 cards. That being said, in this situation, your hand needs 3 cards of 3 suits and 4 cards of another in order to meet the requirements of three of every suit. If you seperate by suit, you have 4 binomial coefficient problems, except you choose 4 cards for one suit instead of 3. At the end, I multiply by the number of suits to include all possibilities of suit choices. For this reason, I setup the problem like this:</i>
+```{r q33}
+total.hands <- choose(52,13)
+three.of.suit <- choose(13,3)
+four.of.suit <- choose(13,4)
+num.suits <- 4
+ans33 <- ((three.of.suit**3)*four.of.suit*num.suits)/total.hands
+cat("Probability is:", ans33)
+```
+
+#### Question 34:
+A group of 30 dice are thrown. What is the probability that 5 of each of the values 1,2,3,4,5,6 appear?
+
+<i>There are 30 die, and we are trying to have each specific number appear a total of 5 times. This sort of relates to the last problem, but in this case everything fits perfectly. At first I was planning on doing `choose(30,5)^5` similarly to the last problem, but I realized this would be overcounting quite a bit because we wouldn't have 30 options for our next bionomial coefficient. This lead me to what I have under `num.scenario`. To get the final probability, we use a similar method to finding all the cards. I came to this idea because in class it was shown that the number of possible outcomes when rolling two dice is 36, or 6^2, and that the number of outcomes for three dice followed this problem. As a result, I used 6^30 to find the total number of outcomes for rolling 30 die.</i>
+```{r q34}
+num.scenario <- choose(30, 5) * choose(25, 5) * choose(20, 5) * choose(15, 5) * choose(10, 5) * choose(5,5)
+total.rolls <- 6^30
+ans34 <- num.scenario / total.rolls
+cat("Probability is:", ans34)
+```
+
+#### Question 42:
+Let A and B be events. The difference B - A is defined to be the set of all elements of B that are not in A. Show that if the event A is contained in the event B, then P(B-A) = P(B) - P(A), directly using the axioms of probability.
+
+<b><i>Axioms:</b> </br>
+P(Nothing) = 0 </br> 
+P(Sample Space) = 1 </br>
+
+There is a rule that P(A union B) = P(A) + P(B) if the events are disjoint.
+</br></br>
+However, we actually have to use the formula P(A union B) = P(A) + P(B) - P(A intersection B) because they are not disjoint. That being said, because the event A is a subset of event B, P(A intersection B) is just P(A). Therefore, our formula is equivalent to P(A union B) = P(A) + P(B) - P(A), which is just P(A union B) = P(B). So, if we care about either event A or event B occuring, event B has to happen.
+</br></br>
+A property of probability is P(A^c) = 1- P(A). If we think of P(B) is our sample space given that we only care about events A or B occuring, then P(B-A) becomes P(A^c), and that also means P(B-A) = 1 - P(A) using the previous property of probabilty mentioned. We can then equate the formula, P(B - A) = 1 - P(A), to P(B-A) = P(B) - P(A) given that B occurs as our sample space. This gets us our final result, but only using conditional probability. That being said, this rule still applies if we used S, our sample space, because the formula would still be P(S - A) = P(A^c) = P(S) - P(A) due to the properties of probability.
+
+</i>
+
+#### Question 47:
+A fair die is rolled n times. What is the probability that at least 1 of the 6 values never appears?
+
+I struggled on this problem quite a bit to be fair. I was trying to do the inverse of the probability asked for because, on a hunch, I got a correct result for a 6 roll. I spent way too much time trying to derive a formula that would work for n rolls. After reviewing this problem in class, I understand it, but I do not think I could have gotten to it by myself. When I set this problem up, I think about it by their distinct numbers first rather than going immediately into the likelihoods. 
+
+To compute the probability of all of these events occuring, we will use the inclusion-exclusion formula P(A union B union C) = P(A) + P(B) + P(C) - P(A intersection B) - P(A intersection C) - P(B intersection C) + P(A intersection B intersection C), but with 6 events instead of 3. I tried to draw a vendiagram of this on my own, but it got far too complicated when more than 4 events started overlapping in certain space. That being said, we have to subtract any even (not choosing 2 and 4 die) event space to remove duplicates based on how these possibilities would overlap when summing their possible outcomes. We add the remainder (the odd number events) of possibilities though. The initital setup computes the likelihood of not rolling one number over n trials. The next is for not rolling two and so on. Then, we multuply each likelihood by the possibile options for the initial selections of the specific number. For the first case, any single roll determines the unique number that cannot appear so there are 6 possibilities. For the second case, we are expecting not to see two numbers so it is "6 sides choose two" and this lasts until it is 6 choose 5. Finally, everything is setup and plugged into the final formula, which saved in the variable `ans47`.
+```{r q47}
+rolls <- 1:10 # some arbitrary numbers
+
+#1 - factorial(rolls)/(6^rolls)
+#1 - 6*choose(7,2)*factorial(5)/6^rolls
+# The first works for six rolls but nothing else. The next only works for 7. I cannot do the inverse probability...
+
+#the likelihood of seeing (n - numerator) many different numbers based on rolls
+one.num <- (5/6)^rolls
+two.num <- (4/6)^rolls
+three.num <- (3/6)^rolls
+four.num <- (2/6)^rolls
+five.num <- (1/6)^rolls
+
+# the final equation with the possibilities of different dice numbers available per roll as a multiplicative of the sums of all the different events
+ans47 <- (6*one.num) - (choose(6,2)*two.num) + (choose(6,3)*three.num) - (choose(6,4)*four.num) + (choose(6,5)*five.num)
+
+cat("Probabilities are:", paste0(ans47,collapse = ", "))
+```
+
