@@ -9,56 +9,87 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Homework 3
+## Homework 4
 
-Page 128, #3, 4, 5, 6, 15
+Page 128, #3, 4, 5, 6, and 15
 
 #### Question 3:
 Let $X$ be an r.v. with CDF $F$ and $Y=\mu+\sigma X$, where $\mu$ and $\sigma$ are real numbers with $\sigma > 0$. (Then $Y$ is called a <i> location-scale transformation</i> of $X$; we still encounter this concept many times in Chapter 5 and beyond.) Find the CDF of $Y$, in terms of $F$. 
 
-<i>Answer goes here
+<i>If $Y$ is definied by $P(Y\leq y)= P(\mu+\sigma X \leq y)$ for some arbitrary y in infinity, then we can find where Y as a transformation of the CDF of F $P(X\leq k)$ for some arbitrary k in infinity. By rearranging the variables, we get a Y that equates to  $P(X\leq\frac {y-\mu}{\sigma})$, which is now a function of the CDF of F using X. Y is equal to the transformation of CDF of F where $P(X\leq \frac {y-\mu}{\sigma})$. Also, because $\sigma$ has to be greater than zero, the value of X should never be undefined. 
 </i>
-```{r q3}
-# code goes here
-```
 
 
 #### Question 4:
 Let $n$ be a positive integer and $F(x)=\frac{\lfloor x \rfloor}{n}$ for $0 \leq x \leq n$, $F(x)= 0$ for $x < 0$, and $F(x)=1$ for $x>n$, where $\lfloor x \rfloor$ is the greatest integer less than or equal to $x$. Show that $F$ is a CDF, and find the PMF that is corresponds to. 
 
-<i>Answer goes here
+<i>The function, $F(x)=\frac{\lfloor x \rfloor}{n}$, is a CDF because it follows the theorem of a valid CDF. Lets say that in our case n is 5, even though it could be any integer greater than or equal to zero. The CDF of F incremently increases by 1/5 for every additional value included in x. Therefore our PMF would be $P(X=k) = 1/n$ for any n, which would be 1/5 for our example. In application, if our CDF is $P(X \leq x)$ then we could find the CDF at $P(X \leq 4)$ given our n of 5 as follows: P(X=0) + P(X=1) + P(X=2) + P(X=3) + P(X=4) = 1/5 + 1/5 + 1/5 + 1/5. This proves our CDF is constantly increasing because our CDF will increase  by 1/n for every additionally value added to X in our range $0 \leq x \leq n$. Additionally, we can say that our CDF converges at 0 and 1 due to the fact that when X=n, our function is $F(X)= \frac n n$, which is 1 and when X is 0, our function is 0 over n. Additionally, the piecewise bounds to our CDF means that any values of X lower than 0 or greater than n are also 0 and 1 respectively. Finally, we just need to prove that our function is right continuous. Normally, The floor symbol around X solves this problem for us. In our case, any arbitrary number between X and X+1 will be equal to X. For example, $P(X \leq 2.9) = P(X \leq 2) = P(X=0) + P(X=1) + P(X=2) = 2/5$ due to our floor function, which means that x only takes on integer values. We have now proved that function F is a CDF. Because each value of x in the space $0 \leq x \leq n$ is equally likely, the CDF of F is also equivalent to the PMF $X \sim DUnif(C)$, or $P(X=x/n)$ for any set of values for x between 0 and n.
 </i>
 ```{r q4}
-# code goes here
+n <- 5 # this n value is arbitrary and can be changed as pleased
+x <- 0:n
+CDF.F <- ecdf(floor(x)/n)
+plot(CDF.F, main=paste("The CDF of F for n =",n))
 ```
 
 
 #### Question 5:
 (a) Show that $p(n)=(\frac{1}{2})^{n+1}$ for $n=0,1,2,...$ is a valid PMF for a discrete r.v.
+Normally, I would just plot this because it becomes apparent in R that as n approaches infinity, the probability of $(\frac{1}{2})^{n+1}$ converges on 1 as shown below.
+```{r q5a}
+n <- 100
+sum.probs <- 0
+vals <- numeric(100) #declaring an empty vector
+for(x in 1:n){
+  sum.probs = sum.probs + 1/2^x
+  vals[x] <- sum.probs
+}
+plot(vals)
+```
+
+
+<i>That being said, after learning about geometric series, I can also show that $\sum\limits_{n=0}^\infty P(n=(\frac{1}{2})^{n+1})$ is equal to 1 because $$g(r)=\sum\limits_{n=0}^\infty = a + ar+ ar^2 + ar^3 + ...+ar^n$$ is equivalent to $\frac{a}{1-r}=a(1-r)^{-1}$. In our case, 1/2 is our probability of success, which means we can plug in that value as $a$ and we are multiply it by $r$ exponentially as we sum our values. Again, this problem makes most sense if $r$ is also 1/2 so that our original formula: $a + ar^2 + ar^3 + ...+ar^n$ still follows $\frac{1}{2}^{0+1}+\frac{1}{2}^{1+1}+\frac{1}{2}^{2+1}+...$. This works because our base value where we do not include $r$ is still $\frac{1}{2}$ and our nth value is still $\frac{1}{2}^n$ or $\frac{1}{2}*\frac{1}{2}^{n-1}$. Therefore, we have enough validation (in my opinion at least) to use the formula $\frac{a}{1-r}$, which means $\frac{1/2}{1-1/2}=1$. This validates our PMF summing to 1 and we have now proved that $P(n=(\frac{1}{2})^{n+1})$ is a PMF.
+</i>
+
 
 (b) Find the CDF for a random variable with the PMF from (a).
 
-<i>Answer goes here
+<i>Because we can use the geometric series to solve the sum of this r.v., I figured that it might also be a geometric r.v. such that $P(X=pq^k) = P(n=(\frac{1}{2})^{n+1})$ for when p and q are symmetric. After plotting the two, it was apparent that this was true and also, if you plug in 1/2 for both p and q, the formula ends up equating to $1/2^{k+1}$, which is equivalent to our original formula for when k and n are equal. Anyway, the CDF for this equation would be $P(X \leq k)$ for $F(x) = pq^k$. Because of the exponent, our function will converge on and has a limit at 0 as approaches it $-\infty$. Similarly, there is a limit at 1 as k approaches $+\infty$, which we proved before using the geometric series. That being said, we can use $P(X=k^\prime)$ to find $P(X\leq k)$. To solve using a specific formula, we will use the derivative of the geometric series known as the convenient formula: $$\sum\limits_{k=1}^n ar^{k-1}=\frac{a(1-r^n)}{1-r}$$ in order to determine the summation of our PMF over time. After plugging in values, this leads us to our CDF of: $$\frac{1/2(1-1/2^{n+1})}{1-1/2}$$ Notice that we need n+1 instead of n so that our first value at 0 is still 1/2. We have to use the shift of the geometric formula so that we are using $ar^{n+1}$ for our final value and k starts at 0 rather than 1 such that $\sum\limits_{k=0}^{n+1}ar^k$. $\frac{1/2(1-1/2^{n+1})}{1-1/2}$ converges to 0 for $-\infty$ and 1 for $\infty$, which are also properties of geometric series. These values are right continuous because they have limits at the previous integer value such that 2.9 decreasing to 2 has a jump discontinuity for $1 - (1/2)^{n+1}$. These values jump for n as follows: [0,1), [1,2),...[n, n+1) while (-$\infty$,0) is just 0.
 </i>
-```{r q5}
-# code goes here
+```{r q5b}
+#validating my first claim about the original formula being a geometric r.v.
+p <- 1/2
+q <- 1-(1/2)
+k <- 0:10
+plot(p*q^k, main="Plotting the Geometric R.V.")
+
+n <- 0:10
+plot(1/2^(n+1), main="Plotting the Original Formula")
+
+n <- -1:10
+final.cdf <- ecdf(.5*((1-.5^(n+1))/(.5)))
+# the final CDF
+plot(final.cdf, main="The Final CDF")
 ```
 
 #### Question 6:
 <i>Benford's law</i> states that in a very large variety of real-life data sets, the first digit approximately follows a particular distribution with about a 30% chance of a 1, and 18% chance of 2 and in general $P(D=j) = log_{10}(\frac{j+1}{j})$, for $j\in \{1,2,3,...,9 \}$, where $D$ is the first digit of a randomly chosen element. Check that this is a valid PMF (using properties of logs, not with a calculator).
 
-<i>Answer goes here
+<i>A function is a PMF so long as it is non-negative and its probabilities in a set sum to 1. For the function $P(D=j) = log_{10}(\frac{j+1}{j})$, for $j\in \{1,2,3,...,9 \}$, as long as our fraction is greater than 1, $log_{10}$ will not give us a negative number. If you analyze $\frac{j+1}{j}$, it can never be less than or equal to 1 because the numerator is always 1 value greater than the denominator. Additionally, we can mathematically check the sum of these values of j such that $P(D \leq 9) = P(D=9) + P(D=8) + ...+P(D=1)=log_{10}(\frac{10}{9})+ log_{10}(\frac{9}{8}) +..+ log_{10}(\frac{2}{1})$ which is equivalent to $log_{10}(10!/9!)=log_{10}(10)=1$.
 </i>
 ```{r q6}
-# code goes here
+log10(factorial(10)/factorial(9)) # does it sum to 1?
 ```
  
 #### Question 15:
 Find the CDF of an r.v. $X \sim DUnif(1,2,...,n)$.
 
-<i>Answer goes here
+<i>This is a similar proof to 4. I used different values in the R code change up the example though. If a CDF is $P(X\leq n)$ for a PMF defined by $P(X=1/n)$, then it would be written as $P(X \leq \frac{k}{n})$ for any k value between 0 and n when its distributed as a discrete uniform r.v. With that being said, to be properly right-continuous as we saw in problem 4, we need the floor function around our k so that $P(X \leq \lfloor k \rfloor) = P(X \leq k)$. Again, the CDF of X is just the accumulation of probabilities as X approaches n. The CDF is 0 for anything less than that and 1 for anything greater than that.
 </i>
 ```{r q15}
-# code goes here
+n <- 20
+k <- 0:n
+plot(rep(1,n)/n, main=paste("PMF of X ~ DUnif(n =",n,")"))
+plot(ecdf(floor(k)/n), main=paste("CDF of Discrete Uniform for n =",n))
 ```
 
