@@ -1,0 +1,128 @@
+---
+title: "Project 1"
+author: "Aidan Draper"
+date: "10/9/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary
+
+Probability is essential for most applications of statistics. This project will informally describe one such
+application and illustrate the role of probability in it.
+
+You will work with the following (thought) experiment: a coin is mechanically flipped n times, with X being
+the number of heads occurring. When do the results provide evidence that the coin is fair, and when do the
+results provide evidence that the coin is biased?
+You should submit a Mathematica file (saved as a PDF) with appropriate sections, including an introduction,
+discussions of each topic, and a conclusion. Your project should be intelligible to someone who has not seen
+this assignment.
+
+Your main reasoning should be based on the following principle: define an event related to X to use as
+evidence, and compute its probability assuming that the coin is fair. If the coin is fair, then the probability
+of the observed event should be relatively high, while if the probability of the observed event is very small,
+it is evidence that the coin is not fair.
+
+The following sections will discuss various events that can be used to test the coin for fairness.
+
+
+## Sections of Project
+
+(1) Exactly half: \hfill \break Explain why it is unrealistic to expect the coin tosses to come up heads exactly half the time $(X = n/2)$.
+Refer to the probabilities for $n = 100$ and $n = 99$ in your answer.
+
+(2) Singleton: \hfill \break Explain why it is unrealistic to use any single outcome’s probability as a test for bias in the coin. Refer
+to the probabilities for $n = 100$; what is the largest value?
+
+(3) Range of Values: \hfill \break Explain what kind of results would lead you to think that the coin was biased to come up heads less than 50% of the time. Using $n = 100$, find the largest possible cut-off $a$ such that the probability that the number of heads $X$ was at most $a$ is less than 5%. Explain your conclusions if $X \leq a$ versus if $X > a$. \hfill \break Briefly re-phrase your argument in terms of testing to see if the coin was biased to come up heads more than 50% of the time.
+
+(4) Probability Boundary: \hfill \break Explain in words how the previous section would have changed if we had used 1% instead of 5%.
+
+## Conclusion
+You should summarize how to use your knowledge of the PMF for X to draw a conclusion as to whether or not the coin is fair.
+
+\clearpage
+
+## Introduction
+
+## Discussion
+Exactly half is an unrealistic expectation for fair coin results, even with the frequentist notion that something with a probability of $0.5$ of occuring will converge on a proportion of $0.5$ successes over an infinite number of trials. The use of sampling distributions and the central limit theory in statistics helps explain why any single value representing the expected population mean would be particularily unlikely. Before we begin though, lets just acknowledge that the probability of $k$ in $n$, where $k$ is equal to $n/2$ and n represents the number of trials, is 0 for any $n \mod 2$ that is equal to one, i.e. odd numbers, because half of any of these values would require a trial with a result of $0.5$ (ex: 99/2 = 49.5) in a world where the flip result, $k$, can only be recorded as success, 1, or failure, 0. 
+
+Now that we are just analyzing $n/2$ for $n = 2,4,6,8,...$ (n is even), lets look at the expected value. Because fair coin flips mimics a discrete random variable $X$ that follows a Binomial Distribution, such that $X \sim \text{Bin}(n,p)$ where $p$ is 0.5, we would calculate expected value as $E(X)=np=100*.5=50$, which supports the notion that exactly half may be a good idea. However, lets also analyze the PMF of $X$ that follows a Binomial Distribution, such that $X \sim \text{Bin}(n,p)$. The formula for this is $PMF(X=k)=\binom{n}{k} p^k(1-p)^{n-k}$ In R, we can visualize this PMF as follows:
+```{r q1a}
+n <- 100
+p <- 0.5
+k <- 0:100
+pmf.x <- choose(n,k) * (p^k) * (1-p)^(n-k)
+plot(pmf.x, xlab="k value", ylab="P(X=k)")
+```
+
+Now, if you wanted to calculate the probability of $k=50$ for our PMF, we can plug it into our formula as follows:
+```{r q1b}
+# because r indexes by 1 and we are starting our vector at 0, we have to use 50+1
+cat("PMF of X for k = 50 is:", pmf.x[51])
+```
+As we can see from our value above, the probability is less than 0.08, which shows that getting exactly 50 heads is rather unlikely. This is because of the variability in the binomial distribution. We can calculate our expected variance as $Var(E(X))=np(1-p)$. This is done in R below:
+```{r q1c}
+var.x <- n*p*(1-p)
+cat("The variance of E(X) is:",var.x)
+```
+The Empirical Rule states that we can expect our sample mean to fall within plus and minus 1 standard deviation 68% of the time in a normal distribution. Our Binomial Distribution is somewhat normal so we can find the interval that would equal close to this by adding the square root of our variance.
+```{r q1d}
+cat("The standard deviation of E(X) is:",sqrt(var.x))
+```
+Our standard deviation is 5, which means our interval of expected values is 45 to 55 for where we would expect our sample mean of $k$ success to fall. For our distribution, we can see what percentage of the time we would expect $k$ to fall between 45 and 55 using our pmf from before.
+```{r q1e}
+# calculate the sum of PMF(X=k) for 45 <= k <=55 (add 1 to the index to get the range)
+cat("We would expect k to fall within our interval, 45 to 55, ",
+    100 * sum(pmf.x[46:56]),"% of the time.")
+```
+This interval as an expected outcome represents much more of the sample space than any single value's outcome would for our $PMF(X=k)$, which is why you would be better off using an interval and it is not reasonable to expect exactly half. Even now, our number of successes, k, will fall above or below this interval about 30% of the time. This provides a nice transition to our next consideration about expecting any singleton set as a \textit{probable} expected outcome.
+
+In general, it would be very unlikely for any specific singleton outcome to occur in n trials. For example, lets assume that $n$ is equal to 100. Regardless of the coin's probability of success (or heads in our case), its sample distribution will always be centered around it's expected value, $E(x) = np$, but with only a probability of around 0.08 to 0.14 of occuring for most values of $p$. In addition, the distribution looks like a shift of our original example. This is shown below in R for six figures of binomial distributions with rather extreme values for the success probability, $p$.
+
+```{r q2a}
+n <- 100
+p <- c(0.01,0.1,0.2,0.8,0.9,0.99)
+k <- 0:n
+par(mfrow=c(2,3))
+pmf.xs <- matrix(nrow=6,ncol=length(k))
+for (row in 1:length(p)){
+  pmf.xs[row,] <- choose(n,k) * (p[row]^k) * (1-p[row])^(n-k)
+  plot(pmf.xs[row,], xlab=paste("k value (p = ",p[row], ")", sep=""),ylab="P(X=k)")
+}
+cat("The max values of our PMFs for 6 diffierent p values were:\n"
+    ,round(apply(pmf.xs, 1, max),digit=4))
+cat("The min values of our PMFs for 6 diffierent p values were:\n", 
+    round(apply(pmf.xs, 1, min),digit=4))
+```
+
+As we can see from our generated minimums and maximums of our PMFs for $p$ probabilites of 0.01, 0.1, 0.2, 0.8, 0.9 and 0.99, respectively, even our most skewed binomial distributions of biased coins would only have a probabiltiy of 0.37 of acheiving their expected value. This is not even close to half of the likelihood of the entire sample space. Additionally, with less biased coins, you would see the the range for any singleton to be almost 0 to no more than 0.14 before the coin gets extremely biased, which would not leave you very confident in any gambling situation nor prediction. An unlikely value of success, such as 15 or 25, for a fair coin may have a probability of almost 0, but the biased coin with the $E(X)$ equal to that k would only increase the likelihood by around 0.08 to 0.014, which is miniscule. These values only apply to $n=100$ but, in general, this is why we cannot be confident in using any singleton value. It is also important to note that in the graphs we see that every value of k has a probability, even if it may be near 0. This means that a single experiment with 100 coin flips of a fair coin could still result in an extreme case, such as 0 heads or 100 heads, which may skew your belief about the coin when in reality you just had an extremely unusual test result. Distributions of multiple experiments of $k$ successes gives us a much better estimate about our population mean of $k$ and true value of $p$. Using these distributions, we can infer our confidence of a specific value of $k$ belonging to our fair coin's potential results using intervals.
+
+We use confidence intervals in statistics to make statements about the likelihood of a value, or sample, belonging to our population. Typically, this is done using values from the Empirical Rule, which says that we can find where values would fall 68, 95 and 99.7 of the time if they came from the true population of our null hypothesis. Additiionally, we would say our results are significantly unlikely if a sample mean fell outside of two standard deivations of our population mean because the sample mean would only likely take on that value or something more extreme roughly 5% (100% - 95%) of the time if the sample came from the population of interest with a normal distribution. We can calculate confidence intervals using our expected mean and the variance score calculated from before as follows:
+
+```{r q3a}
+p <- .5
+cat("Our 95 confidence interval is (",n*p - (2 * sqrt(var.x)), ", ",
+    n*p + (2 * sqrt(var.x)),").", sep="")
+```
+This value will not quite be right though because our distribution is not normal. That being said, if we wanted to find where 50% of the time our trials would land heads. We could calculate the sum of our probability mass function to .25 on both sides around our expected value. I would do this in R using a for loop to get the sum of one side equal to .25 and then add $E(X) - k$ to the other side of my interval to find the range of values because our distribution is symmetric when $p = 1-p$.
+```{r q3b}
+index <- 51
+sum_pmf <- pmf.x[51]
+e_x <- n*p
+sum_pmf
+while(sum_pmf<0.25){
+  sum_pmf=sum_pmf + pmf.x[index+1]
+  index=index+1
+}
+range <- c(50-(index - 51),index-1)
+cat("Our range, ",range[1]," to ",range[2]," covers ",
+    round(sum(pmf.x[range[1]:range[2]+1])*100,2),"% of our PMF.",sep="")
+```
+
+
+## Conclusion
