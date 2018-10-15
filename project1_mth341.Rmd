@@ -11,20 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Summary
 
-Probability is essential for most applications of statistics. This project will informally describe one such
-application and illustrate the role of probability in it.
+Probability is essential for most applications of statistics. This project will informally describe one such application and illustrate the role of probability in it.
 
 You will work with the following (thought) experiment: a coin is mechanically flipped n times, with X being
 the number of heads occurring. When do the results provide evidence that the coin is fair, and when do the
 results provide evidence that the coin is biased?
 You should submit a Mathematica file (saved as a PDF) with appropriate sections, including an introduction,
-discussions of each topic, and a conclusion. Your project should be intelligible to someone who has not seen
-this assignment.
+discussions of each topic, and a conclusion. Your project should be intelligible to someone who has not seen this assignment.
 
 Your main reasoning should be based on the following principle: define an event related to X to use as
-evidence, and compute its probability assuming that the coin is fair. If the coin is fair, then the probability
-of the observed event should be relatively high, while if the probability of the observed event is very small,
-it is evidence that the coin is not fair.
+evidence, and compute its probability assuming that the coin is fair. If the coin is fair, then the probability of the observed event should be relatively high, while if the probability of the observed event is very small, it is evidence that the coin is not fair.
 
 The following sections will discuss various events that can be used to test the coin for fairness.
 
@@ -48,8 +44,10 @@ You should summarize how to use your knowledge of the PMF for X to draw a conclu
 
 ## Introduction
 
+Determining whether or not bias exists in the use of a coin requires an experimental design that captures how our coin acts. In addition, it requires understanding the way in which our data would be distributed under the use of a fair coin. Quantifying how our "normal", or expected, coin exists as outcomes in its sample space is crucial to capturing what would be signficantly unexpected results from our experiment. In our discussion, we will mention why we use some methods over others and how probability plays an essential role in all statistical methods and designs.
+
 ## Discussion
-Exactly half is an unrealistic expectation for fair coin results, even with the frequentist notion that something with a probability of $0.5$ of occuring will converge on a proportion of $0.5$ successes over an infinite number of trials. The use of sampling distributions and the central limit theory in statistics helps explain why any single value representing the expected population mean would be particularily unlikely. Before we begin though, lets just acknowledge that the probability of $k$ in $n$, where $k$ is equal to $n/2$ and n represents the number of trials, is 0 for any $n \mod 2$ that is equal to one, i.e. odd numbers, because half of any of these values would require a trial with a result of $0.5$ (ex: 99/2 = 49.5) in a world where the flip result, $k$, can only be recorded as success, 1, or failure, 0. 
+For starters, exactly half is an unrealistic and naive expectation for fair coin results, even with the frequentist notion that something with a probability of $0.5$ of occuring will converge on a proportion of $0.5$ successes over an infinite number of trials. The use of sampling distributions in statistics helps explain why any single value representing the expected population mean would be particularily unlikely. Before we begin though, lets just acknowledge that the probability of $k$ in $n$, where $k$ is equal to $n/2$ and n represents the number of trials, is 0 for any $n \mod 2$ that is equal to one, i.e. odd numbers, because half of any of these values would require a trial with a result of $0.5$ (ex: 99/2 = 49.5) in a world where the flip result, $k$, can only be recorded as success, 1, or failure, 0. 
 
 Now that we are just analyzing $n/2$ for $n = 2,4,6,8,...$ (n is even), lets look at the expected value. Because fair coin flips mimics a discrete random variable $X$ that follows a Binomial Distribution, such that $X \sim \text{Bin}(n,p)$ where $p$ is 0.5, we would calculate expected value as $E(X)=np=100*.5=50$, which supports the notion that exactly half may be a good idea. However, lets also analyze the PMF of $X$ that follows a Binomial Distribution, such that $X \sim \text{Bin}(n,p)$. The formula for this is $PMF(X=k)=\binom{n}{k} p^k(1-p)^{n-k}$ In R, we can visualize this PMF as follows:
 ```{r q1a}
@@ -102,27 +100,60 @@ cat("The min values of our PMFs for 6 diffierent p values were:\n",
 
 As we can see from our generated minimums and maximums of our PMFs for $p$ probabilites of 0.01, 0.1, 0.2, 0.8, 0.9 and 0.99, respectively, even our most skewed binomial distributions of biased coins would only have a probabiltiy of 0.37 of acheiving their expected value. This is not even close to half of the likelihood of the entire sample space. Additionally, with less biased coins, you would see the the range for any singleton to be almost 0 to no more than 0.14 before the coin gets extremely biased, which would not leave you very confident in any gambling situation nor prediction. An unlikely value of success, such as 15 or 25, for a fair coin may have a probability of almost 0, but the biased coin with the $E(X)$ equal to that k would only increase the likelihood by around 0.08 to 0.014, which is miniscule. These values only apply to $n=100$ but, in general, this is why we cannot be confident in using any singleton value. It is also important to note that in the graphs we see that every value of k has a probability, even if it may be near 0. This means that a single experiment with 100 coin flips of a fair coin could still result in an extreme case, such as 0 heads or 100 heads, which may skew your belief about the coin when in reality you just had an extremely unusual test result. Distributions of multiple experiments of $k$ successes gives us a much better estimate about our population mean of $k$ and true value of $p$. Using these distributions, we can infer our confidence of a specific value of $k$ belonging to our fair coin's potential results using intervals.
 
-We use confidence intervals in statistics to make statements about the likelihood of a value, or sample, belonging to our population. Typically, this is done using values from the Empirical Rule, which says that we can find where values would fall 68, 95 and 99.7 of the time if they came from the true population of our null hypothesis. Additiionally, we would say our results are significantly unlikely if a sample mean fell outside of two standard deivations of our population mean because the sample mean would only likely take on that value or something more extreme roughly 5% (100% - 95%) of the time if the sample came from the population of interest with a normal distribution. We can calculate confidence intervals using our expected mean and the variance score calculated from before as follows:
+We use confidence intervals in statistics to define a range within our sampling distribution and then, make statements about the likelihood of a resultant value, or sample, belonging to our expected population. Typically, this is done using values from the Empirical Rule, which says that we can find where values would fall 68, 95 and 99.7 of the time if they came from the true population of our null hypothesis. Additiionally, we would say our results are significantly unlikely if a sample mean fell outside of two standard deivations of our population mean because the sample mean would only likely take on that value or something more extreme roughly 5% (100% - 95%) of the time if the sample came from the population of interest with a normal distribution. We can calculate confidence intervals using our expected mean and the variance score calculated from before as follows:
 
 ```{r q3a}
 p <- .5
 cat("Our 95 confidence interval is (",n*p - (2 * sqrt(var.x)), ", ",
     n*p + (2 * sqrt(var.x)),").", sep="")
 ```
-This value will not quite be right though because our distribution is not normal. That being said, if we wanted to find where 50% of the time our trials would land heads. We could calculate the sum of our probability mass function to .25 on both sides around our expected value. I would do this in R using a for loop to get the sum of one side equal to .25 and then add $E(X) - k$ to the other side of my interval to find the range of values because our distribution is symmetric when $p = 1-p$.
+This value will not quite be right though because our distribution is not normal. That being said, we can sum our PMF of individual single events from the right side side until we hit 0.95 if we wanted to find out, at least, how many heads we would expect 95% of the time. We want to find $k$ where $PMF_X(j\leq k\leq 100)$ for some j that represents our cutoff point of 95% of our total PMFs sample space (starting from the right). This essentially represents a portion of our cumulative density function for our PMF such that our CDF of X is our $PMF_(X\leq k)_X$ for some range $j\leq k\leq l$ where $j$ represents the lower bounds and $l$ represents the upper bounds of our range of interest. In general, our CDF exists as a piecewise function that represents $\binom{n}{k} p^k(1-p)^{n-k}$ for 0 to $n$ and any k value less than 0 represents 0 of our cumulative probability while anything greater than $n$ represents our entire sample space of 1. That being said, we are only interested in our CDF where it exists within the PMF so it is not neccessary for this problem per say, but is still a useful thought process for explaining the accumulation of probabilities in our PMF for the range of values. This process can be simulated in R using a for loop to get the sum of one side until you hit a probability of 0.95.
 ```{r q3b}
-index <- 51
-sum_pmf <- pmf.x[51]
-e_x <- n*p
-sum_pmf
-while(sum_pmf<0.25){
-  sum_pmf=sum_pmf + pmf.x[index+1]
-  index=index+1
+j <- 101
+sum_pmf <- pmf.x[101] # starting from the left side
+while(sum_pmf<0.95){
+  sum_pmf=sum_pmf + pmf.x[j-1]
+  j=j-1
 }
-range <- c(50-(index - 51),index-1)
-cat("Our range, ",range[1]," to ",range[2]," covers ",
-    round(sum(pmf.x[range[1]:range[2]+1])*100,2),"% of our PMF.",sep="")
+cat("Our one-sided 95% confidence interval falls within our PMF's range of",
+    " k values from\n", j-1, " to 100.",sep="")
 ```
+Using R, we can find the range of our PMF that covers 95% of our outcome sample space. Note that this calculation covers about 96% of our sample space because the probability mass funciton jumps from 94% to 96% at the particular k values of coins landing heads. In this case, I used the larger interval, rather than the smaller, that makes up $PMF_X(42\leq k\leq 100)$. If, in an experiment, we saw less than 42 heads out of 100 coin flips was our mean of our experiment results we might say that our results were significant enough to question whether the coin was biased such that the coin flips were favoring tails. While a single trial coming up with less than 42 heads out of 100 flips may be unlikely, I would not use it to make any claims about the coin because 0.05 is still a large likelihood for a single event to occur as we saw from looking at our maximum singleton outcome of 0.08 from before. Additionally, we can flip this confidence interval around to give us information about a significant mean of heads that might tell us our coin was biased in favor of landing heads.
+```{r q3c}
+j <- 1
+sum_pmf <- pmf.x[1] # starting from the right side
+while(sum_pmf<0.95){
+  sum_pmf=sum_pmf + pmf.x[j+1]
+  j=j+1
+}
+cat("Our one-sided 95% confidence interval falls within our PMF's range of",
+    " k values from\n0 to ", j-1,".",sep="")
+```
+Because of our calculations above, we can say that it would be odd for our sample mean of a coin repeatedly landing heads in an experiment to fall outside of the interval of 0 to 58 heads after 100 flips. These intervals describe two spaces of $X$ that operate around a cutoff probability, $a$. $X \leq a$ describes significant findings (support for having used a biased coin) and $X > a$ would be considered to be some degree of expected results for a fair coin. Now, if we wanted to increase our confidence in finding something significant from an experiment, we can decrease our value of $a$.
 
+Finally, we could increase the difficulty of finding a result significant, but, in doing so, increase our confidence in supporting the idea that a coin is biased. Some domains of science require different alpha levels, $a$, in order to find their tests significant. For example, statistics tests commonly use 0.05, but if a particle physicist used that value, they would find every test significant. Therefore, they must use an alpha level of 0.01 and sometimes even 0.001.
+
+```{r q4a}
+j <- 1
+sum_pmf <- pmf.x[1] # starting from the right side
+while(sum_pmf<0.99){
+  sum_pmf=sum_pmf + pmf.x[j+1]
+  j=j+1
+}
+cat("Our one-sided 99% confidence interval falls within our PMF's range of",
+    " k values from\n0 to ", j-1,".",sep="")
+
+j <- 101
+sum_pmf <- pmf.x[101] # starting from the left side
+while(sum_pmf<0.99){
+  sum_pmf=sum_pmf + pmf.x[j-1]
+  j=j-1
+}
+cat("Our one-sided 99% confidence interval falls within our PMF's range of",
+    " k values from\n", j-1, " to 100.",sep="")
+```
+In this case, we would find that 99% of the time we can expect a fair coin to lands heads 0 to 62 times, or 38 to 100 times, of 100 flips depending on whether we were interested in testing towards bias in favor of heads or tails. If we were searching for significant results, we would be looking for instances where greater than 62 was occuring quite frequently instead of values above 58 for biased results in favor of heads. Additionally, if we had roughly more than 30 trials of 100 flips, a sample mean of greater than 62 would be a strong idicator that the coin may be biased in favor of heads. Confidence intervals can be useful for supporting hypothesis and provided question-specific evidence towards a problem as we have seen from these examples. 
 
 ## Conclusion
+
+In conclusion, we would never want to expect any single value as result of an experiment to prove whether a coin was biased or not. The chance of getting that single value, given a fair coin, does not even have a likelihood of 0.08 of occuring. Probability mass functions are great ways of defining the probability of the population of events that exist within our sample space. We saw that groups and ranges of events are better ways of testing for bias once it became apparent that most singleton events have low probabilities on their own. Cumulative density functions are great ways for capturing ranges in general, even though we did not neccessarily use them for this example. CDFs make it apparent what would be unusual to see in an experiment. If we wanted to test for bias, probability plays an essential role in understanding how to determine what results may be odd. We can use them in problem-specific environents to determine different levels of confidence for discovering significant results. Statistical tests (T-tests, ANOVA tests, Chi-squared tests, etc.) are based almost entirely under this idea.   

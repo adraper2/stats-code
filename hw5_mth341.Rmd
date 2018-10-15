@@ -1,0 +1,107 @@
+---
+title: "MTH 341 - HW5"
+author: "Aidan Draper"
+date: "10/07/2018"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 5
+
+Page 178, #2, 3, 14, 23, 27, 34, 37, 57, 58
+
+#### Question 2 (Expectations and variances):
+In the Gregorian calendar, each year has either 365 days (a normal year) or 366 days (a leap year). A year is randomly chosen, with probability 3/4 of being a normal year and 1/4 of being a leap year. Find the mean and variance of the number of days in a chosen year.
+
+\textit{We can use the standard formula of $E(X)=\sum x *p(x)$ for all values of x. In our case, there are only two that exist in the sample space. The variance of this can then be calculated using $E(X^2)-(E(X))^2$. $E(X^2)$ can be found by squaring the values first and then using the same formula for the expected mean.}
+```{r q2}
+vals <- c(365,366) # vector of values
+probs <- c(.75,.25) # veector of probabilities
+expected.mean <- sum(vals*probs)
+expected.var <- sum(vals^2 * probs) - expected.mean^2
+cat("The mean number of days in a chosen year is:", expected.mean, 
+    "\nand the variance in the mean number of days in a chosen year is:", 
+    expected.var)
+```
+
+
+#### Question 3 (Expectations and variances):
+(a) A fair die is rolled. Find the expected value of that roll.
+
+\textit{A fair die follows a discrete uniform distribution such that $X \sim \text{Dunif}(1,2,3,4,5,6)$. In order to calculate the expected value, we can quite easily calculate the sum of the probabilities multiplied by their values. This is done in R below.}
+```{r q3a}
+outcomes <- 1:6
+prob <- 1/6
+expected.die <- sum(outcomes*prob)
+cat("The expected value of one die is", expected.die)
+```
+
+(b) Four fair die are rolled. Find the expected total of the rolls.
+
+\textit{This problem is not much more complicated than the previous. In order to find $E(4X)$, it turns out that we can actually just use the theorem of linearity of expectation and pull the constant out so that we can multiply our expected value of one die by 4.}
+```{r q3b}
+expected.four.die <- 4 * expected.die
+cat("The expected total value of four die is", expected.four.die)
+```
+
+
+
+#### Question 14 (Expectations and variances):
+Let $X$ have PMF $$P(X=k)=cp^k/k \text{ for } k = 1,2,...,$$ where $p$ is a parameter with $0 < p < 1$ and $c$ is a normalizing constant. We have $c=-1/log(1-p)$ as seen in the Taylor series $$-log(1-p)=p+\frac{p^2}{2}+\frac{p^3}{3}+...$$ This distribution is called the $Logarithmic$ distribution (because of the log in the above Taylor series), and has often been used in ecology. Find the mean and variance of $X$.
+
+\textit{To figure out the expected value, we must notice a trend in the infinite summation of the equation: $$\sum \limits_{k=1}^{\infty} c *\frac {p^k}{k} *k= \sum \limits_{k=1}^{\infty}cp^k$$This trend is called a geometric series where $a + ar + ar^2 + ar^3+..+ar^n$ converges on the formula $\frac{a}{1-r}$ for when the absolute value of r is less than 1. In our case, our $a$ value must be $c*p$ and our $r$ value is $p$ such that $$\sum \limits_{k=1}^{\infty} c *\frac {p^k}{k} = cp + cp^2 + cp^3 +...+cp^n=\frac{cp}{1-p} $$Now, it is apparent that our \textbf{expected value} is $$\frac{\frac{-1}{log(1-p)}*p}{1-p}$$ In order to find our expected variance, we need to calculate $Var(X)=E(X^2)-(E(X))^2$. Now, we must solve $E(X^2)$, which we can do using LOTUS, but it doesn't simplify as nicely: $$\sum \limits_{k=1}^{\infty} c *\frac {p^k}{k} *k^2= \sum \limits_{k=1}^{\infty}ckp^k$$That being said, we can use the formula for differntiating a Geometric expected value to solve for variance from Example 4.6.4, with some slight manipulation, to solve this problem. This formula was $$\sum \limits_{k=0}^{\infty}q^k=\frac{1}{1-q}$$, which differentiates to $$\sum \limits_{k=1}^{\infty}kq^{k-1}=\frac{1}{(1-q)^2}$$(Note that we use k=1, not k=0 because the resultant value of the formula for k=0 is just 0 when k is used. Therefore, we just start from k=1.) However, this forumla gives us $k(k-1)$ when we want $k^2$ so we will replenish the "supply of $q$'s" by muliplying both sides by q. This gives us $$\sum \limits_{k=0}^{\infty}kq^k=\frac{q}{(1-q)^2}$$This example is actually exactly the same as our problem except instead of $q$ we have $p$ and our resultant differentiated equation needs to include our constant, $c$, from before. Therefore, we have: $$c\sum \limits_{k=1}^{\infty}kp^k=c\frac{p}{(1-p)^2}$$Our \textbf{expected variance} is now: $$Var(X)=c\frac{p}{(1-p)^2}-(\frac{cp}{1-p})^2$$}
+
+
+#### Question 23 (Expectations and variances):
+Let $X\sim \text{Bin}(n,p)$ and $Y\sim \text{NBin}(r,p)$. Using a story about a sequence of a Bernoulli trial, prove that $P(X<r)=P(Y>n-r)$.
+
+\textit{Insert answer here}
+```{r q23}
+
+```
+
+#### Question 27 (Expectations and variances):
+(a) Use LOTUS to show that for $X\sim \text{Pois}(\lambda)$ and any function $g$, $$E(Xg(x))=\lambda E(g(X+1)).$$ This is called the \textit{Stein-Chen identity} for the Poisson.
+
+(b) Find the third moment $E(X^3)$ for $X \sim \text{Pois}(\lambda)$ by using the identity from (a) and a bit of algebra to reduce the calculation to the fact that $X$ has mean $\lambda$ and variance $\lambda$.
+
+\textit{Insert answer here}
+```{r q27}
+
+```
+
+#### Question 34 (Indicator r.v.s):
+Each of $n \geq 2$ people puts his or her name on a slip of paper (no two have the same name). The slips of paper are shuffled in a hat, and then each person draws one (uniformly at random at each stage, without replacement). Find the average number of people who draw their own names.
+
+\textit{Insert answer here}
+```{r q34}
+
+```
+
+#### Question 37 (Indicator r.v.s):
+You have a well-shuffled 52-card deck. On average, how many pairs of adjacent cards are there such that both cards are red?
+
+\textit{There are 26-1 pairs because the first and last card cannot be a pair. The probability of any of these pairs simplifies to 26/52 (the first card) multiplied by the 25/51 (the second card) because we assume independence between trials, even though there definitely is not. This essentially mimics an odd discrete uniform distribution, except all of our values are essentially just 1 because we care about the total, or count. Nonetheless, now we can calculate the expected value as follows:}
+```{r q37}
+pairs <- rep(1,25)
+prob <- ((26/52) * (25/51))
+expected.pairs <- sum(pairs*prob)
+cat("On average, we would expect",expected.pairs, "pairs.")
+```
+
+#### Question 57 (LOTUS):
+For $X \sim \text{Pois}(\lambda)$, find $E(2^X)$, if it is finite.
+
+\textit{For starters, a Poisson distribution is always going to be finite so this is not an issue. The expected value of $E(2^X)$ is $\sum \limits_{k=0}^{\infty}2^k\frac{\lambda}{k!}e^{-\lambda}$ due to LOTUS, which says that $E(g(x))=\sum \limits_{x}g(x)P(X=x)$. The PMF of X is from the Maclaurin Series, which says that $\sum \limits_{k=0}^{\infty}\frac{x^k}{k!}e^x$. $x$ is $\lambda$ in our case. Using this Taylor Series, we can simplify by pulling out $e^{-\lambda}$ of the summation because it is a constant. Now we have, $$E(2^X)=e^{-\lambda} \sum \limits_{k=0}^{\infty}2^k\frac{\lambda^k}{k!}=e^{-\lambda} \sum \limits_{k=0}^{\infty}\frac{(2\lambda)^k}{k!} = e^{-\lambda}e^{2\lambda}$$$e^{-\lambda}e^{2\lambda}$ is our final answer. We can simplify the summation because the sum of a valid PMF of a Poisson distribution expands into a Taylor Series and simplifies to e to the power of whatever is in the formula's numerator so long as those values were originally to the power of k. For example, $E(X)=\sum \limits_{k=0}^{\infty}\frac{\lambda^k}{k!}=e^\lambda$.}
+
+#### Question 58 (LOTUS):
+For $X \sim \text{Geom}(p)$, find $E(2^x)$ (if it is finite) and $E(2^{-X})$ (if it is finite). For each, make sure to clearly state what the values of $p$ are for which it is finite.
+
+\textit{Insert answer here}
+```{r q58}
+
+```
