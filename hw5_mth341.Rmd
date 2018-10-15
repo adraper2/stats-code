@@ -59,7 +59,7 @@ Let $X$ have PMF $$P(X=k)=cp^k/k \text{ for } k = 1,2,...,$$ where $p$ is a para
 #### Question 23 (Expectations and variances):
 Let $X\sim \text{Bin}(n,p)$ and $Y\sim \text{NBin}(r,p)$. Using a story about a sequence of a Bernoulli trial, prove that $P(X<r)=P(Y>n-r)$.
 
-\textit{Insert answer here}
+\textit{X represents the number of successful coin flips that land heads out of n flips for some arbitrary coin. Y represents the number of tails before r successful heads using the same coin. X<r therefore represents an event where there are less than r heads out of n flips. An important distinction now is that, for Y to exist, we might need to pass n trials if during that period we did not acheive the r number of heads that we desired. We could call this size s, which represents our total number of trials after n has been reached for our negative binomial. s-r will be greater than n-r in this case. It turns out that $P(X<r)=P(Y>n-r)$ because Y greater than "n trials minus r successes" is actually the same thing as the number of tails before X gets to the correct number of r heads. We just had to bound our negative binomial slightly differently with s because of how it operates in the story. Because our trials are either heads or tails, n-r represents our tails within n trials. However, we can actually operate a space past r successes in our negative binomial distribution. Nonetheless, they are equivalent because they have been normalized to equate to the same probability within two different sample spaces, n and s.}
 ```{r q23}
 
 ```
@@ -67,25 +67,22 @@ Let $X\sim \text{Bin}(n,p)$ and $Y\sim \text{NBin}(r,p)$. Using a story about a 
 #### Question 27 (Expectations and variances):
 (a) Use LOTUS to show that for $X\sim \text{Pois}(\lambda)$ and any function $g$, $$E(Xg(x))=\lambda E(g(X+1)).$$ This is called the \textit{Stein-Chen identity} for the Poisson.
 
+\textit{These are essentially equivalent because of the convergence on Taylor Series and due to the fact that the first value, k=0, is actually meaningless in the expected value because the summation includes k in the formula. For example, our expacted value of $E(X)$ for k is equal to $$\sum \limits_{k=0}^{\infty}kg(k)\frac{\lambda^k}{k!}e^{-\lambda}$$For this to be setup correctly, we can throw out the first value of k=0 (its expected value just equals 0) such that our formula is now $$\sum \limits_{k=1}^{\infty}kg(k)\frac{\lambda^k}{k!}e^{-\lambda}$$From here, we can move our k into the denominator of the Poisson PMF so that we have factored out a k and also, factor out a lambda from our numerator so that the formula now is $$\lambda\sum \limits_{k=1}^{\infty}g(k)\frac{\lambda^{k-1}}{(k-1)!}e^{-\lambda}$$If we invent a new set j that equals k-1, we can plug in the values to show that $E(Xg(x))=\lambda E(g(X+1))$. $$\lambda\sum \limits_{j=0}^{\infty}g(j+1)\frac{\lambda^{j}}{(j)!}e^{-\lambda}$$which equals $\lambda E(g(X+1))$ because the summation after our constant, $\lambda$, is just the expected value of g(X+1).}
+
 (b) Find the third moment $E(X^3)$ for $X \sim \text{Pois}(\lambda)$ by using the identity from (a) and a bit of algebra to reduce the calculation to the fact that $X$ has mean $\lambda$ and variance $\lambda$.
 
-\textit{Insert answer here}
-```{r q27}
-
-```
+\textit{To find the variance of $X$, we need to use the formula $Var(X)=E(X^2)-(E(X))^2$. We need this in order to get $E(X^2)$, which equals $Var(X) + (E(X))^2$ with some slight formula manipulation. We can breakdown $E(X^3)=E(X)*E(X^2)$ so that it is easier to work with. This ends up being equivalent to the same formula we used $E(Xg(X))$ where $g(X)=X^2$. Now, we have $E(Xg(X))=\lambda E(g(X+1))$ from before. This becomes $E(Xg(X))=\lambda E((x+1)^2)$ when we plug in $g(X)$. Now using LOTUS, $$\lambda E((X+1)^2=\lambda \sum \limits_{k=0}^{\infty}k^2\frac{\lambda^k}{k!}e^{-\lambda}$$ and, from Example 4.7.2, we know that $E(X^2)$ equals $\lambda(\lambda +1)$, which means our final answer is $\lambda*\lambda(\lambda +1)=\lambda^3+\lambda^2$.}
 
 #### Question 34 (Indicator r.v.s):
 Each of $n \geq 2$ people puts his or her name on a slip of paper (no two have the same name). The slips of paper are shuffled in a hat, and then each person draws one (uniformly at random at each stage, without replacement). Find the average number of people who draw their own names.
 
-\textit{Insert answer here}
-```{r q34}
+\textit{Let X = 0,1,2,...,n-2,n because "everyone except for one person" cannot exist since the last person would have to draw their own name as well. We can setup each person as an indicator variable that yields either 1, a match, or a 0, no match, such that $X = I_1 + I_2+...+I_{n}$. $E(I_k)=1/n$ because of the fundamental bridge between probability and expectation for indicator random variables, which mimics Example 4.4.4 (matching continued) from the book. Therefore, our final answer is $E(X)=E(I_1)+E(I_2)+...+E(I_n)=n*1/n=1$ and we can expect 1 match regardless of the size, n.}
 
-```
 
 #### Question 37 (Indicator r.v.s):
 You have a well-shuffled 52-card deck. On average, how many pairs of adjacent cards are there such that both cards are red?
 
-\textit{There are 26-1 pairs because the first and last card cannot be a pair. The probability of any of these pairs simplifies to 26/52 (the first card) multiplied by the 25/51 (the second card) because we assume independence between trials, even though there definitely is not. This essentially mimics an odd discrete uniform distribution, except all of our values are essentially just 1 because we care about the total, or count. Nonetheless, now we can calculate the expected value as follows:}
+\textit{There are 26-1 pairs because the first and last card cannot be a pair. The probability of any of these pairs simplifies to 26/52 (the first card) multiplied by the 25/51 (the second card) because we assume independence between trials, even though there definitely is not. This essentially also mimics our indicator random variable Example 4.4.4 (matching continued), except we have $\frac{26}{n}*\frac{25}{n-1}$ instead of $\frac{1}{n}$ and we multiply by 25 instead of $n$ because we care about the total, or count, of pairs of red cards. Nonetheless, now we can calculate the expected value as follows:}
 ```{r q37}
 pairs <- rep(1,25)
 prob <- ((26/52) * (25/51))
@@ -101,7 +98,6 @@ For $X \sim \text{Pois}(\lambda)$, find $E(2^X)$, if it is finite.
 #### Question 58 (LOTUS):
 For $X \sim \text{Geom}(p)$, find $E(2^x)$ (if it is finite) and $E(2^{-X})$ (if it is finite). For each, make sure to clearly state what the values of $p$ are for which it is finite.
 
-\textit{Insert answer here}
-```{r q58}
+\textit{X = 0,1,2,... and we can compute $E(2^X)$ using LOTUS. $E(X) = \sum \limits_{k=0}^{\infty}kpq^k$, therfore $E(2^X)=\sum \limits_{k=0}^{\infty}2^kpq^k$. We can simplify the Taylor Series if we pull out the constant, $p$, such that $p\sum \limits_{k=0}^{\infty}2^kq^k=p\sum \limits_{k=0}^{\infty}(2q)^k$, which simplifies to $\frac{a}{1-r}$, which in our case is $p*\frac{1}{1-2q}$ because $a=1$ and $r=2q$. For $p$ to be defined, neither p nor q can equal 0.5 because that would make the denominator 0.}
 
-```
+\textit{We can compute $E(2^{-X})$ also using LOTUS. $E(X) = \sum \limits_{k=0}^{\infty}kpq^k$, therfore $E(2^{-X})=\sum \limits_{k=0}^{\infty}\frac{1}{2^k}pq^k$. We can simplify the Taylor Series if we pull out the constant, $p$, such that $p\sum \limits_{k=0}^{\infty}\frac{1}{2^k}q^k=p\sum \limits_{k=0}^{\infty}(q/2)^k$, which simplifies to $\frac{a}{1-r}$, which in our case is $p*\frac{1}{1-q/2}$ because $a=1$ and $r=q/2$. In this case, p is always defined in the function because q cannot be greater than 1.}
