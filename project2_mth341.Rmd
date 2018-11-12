@@ -1,0 +1,91 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We know that our decision process: we will use our sample data to compute \textit{ T} and see if it appears to be too extreme. If $T \leq -a$ or $T \geq a$, we will reject the null hypothesis, claiming that there is evidence that the population mean differs from 7.0. If $-a \leq T \leq a$, then we will accept the null hypothesis; there is not enough evidence to convince us that the population mean differs from 7.0.
+
+3. Compute $T$ and decide whether or not to accept or reject the null hypothesis.
+
+## Introduction
+Comparing samples to predicted populations is interesting because these distributions can be approximated by the distributions of random variables so long as the assumptions of a specific test are met. In this case, we want to make sure our data is bell-shaped so that we can approximate our distribution as a t-distribution. This allows us to then use probability theory to make an inference about the likelihood of drawing our sample data based on a hypothesized population mean we wanted to test without even knowing the standard deviation of our population. In the following sections, we will discuss why we can use the standard T-test to test whether or not it would be likely for a lake, that we took a sample of 100 pH level scores from, to have a population mean pH level of 7.0. 
+
+## Discussion
+To begin a standard one-sample t-test, we must first define what our hypotheses, $H_o$ (the null) and $H_a$ (the alternative), are in the context of the problem. We are going to reject or fail to reject our null hypothesis that the population mean acidity level is equal to the neutral pH level of 7.0 in the lake of interest. This means that our alternative hypothesis states that the population mean acidity level is not equal to the neutral pH level of 7.0 in the lake of interest. In symbolic notation this would be:
+$$H_0:\mu=7.0$$
+$$\text{(or)}$$
+$$H_A:\mu\neq7.0$$
+We will attempt to validate whether we can reject the null, or fail to do so, by comparing our hypothesized mean value to a sample distribution. In a perfect world, we could generalize our sample distribution as reflecting that of a normal distribution to perform the test and then see where our hypothesized mean fell within that probability density function. We will dive into this deeper later. That being said, because the sample size is a factor in our experiment, random chance could lead us to never finding significant results (rejecting the null) becuase there is very little weight in the tails after the significance levels of our probability density function. Additionally, this would cause us to be significantly more likely of making a Type II error and we typically want to avoid doing this, or minimize the likelihood of this happening in general, because it means we have drawn an incorrect conclusion about our population from our sample. For reference, Type II error is when we accept the null hypothesis when it is actually false. We use Student's t-distribution because it is like a Normal distribution except, at smaller samples, it has larger tail to account for the possibility of selecting very sparse and very condense values from the true distribution that most likely do not represent the true shape of the population. If this were to happen, we might not accurately reflecting our population's distribution, and might draw an incorrect conclusion about our hypothesized population mean based on our sample data. 
+
+This differing tails of the distribution are shown below by comparing a normal distribution to a t-distribution with 9 degrees of freedom (a sample size of 10):
+``` {r part1a}
+size <- (600:1400/100)-10
+
+pdf.t <- dt(size, df =10)
+pdf.norm <- dnorm(size, mean=0, sd=1)
+
+par(mfrow=c(1,2))
+plot(size,pdf.norm)
+plot(size,pdf.t)
+
+cat("The normal distribution has a simualted discrete probability of\n ",pdf.norm[650], 
+    "at position", (650+600)/100-10, 
+    "while the t-distribution has a\n simualted discrete probabiltiy of",
+    pdf.t[650])
+```
+On first glance, you may think that the distributions are the same, but if we output an arbitrary value in an area that would likely be part of the tail at the same position in both distributions, you can see that they actually vary by quite a bit. Note that normally these value zero, but we have to use discrete events in R to simulate our density. Nonetheless, this still reflects the different weights that occur in the normal distribution and a t-distribution with a small sample size. As the sample size increases, the t-distribution will converge on the normal distribution though. The tails get increasingly smaller as the sample size grows.
+
+The use of the t-distribution is supported by the Central Limit Theorem. Our t-distribution essentially reflects many sample means that we could pontentially draw from our population. The Central Limit Theorem states that, as our sample size gets smaller, the variability in the distribution of the means we sample gets larger and our distribution as a whole gets less normal. To cope, we use this t-distribution. 
+
+As we preivously mentioned, the t-distribution reflects all potential sample means surrounding our current null hypothesis mean. The probability density function of this distribution reflects the likelihood of our sample mean be a result of a population with that mean given our sample's mean and standard deviation. That being said, we actually must use a cumulative distribution to infer about the probability of our sample mean being from our population because the random variable's distribution is continuous and any one sample mean technically has a probability of 0. So, we use a significance level, called $\alpha$, to define a cutoff point in our cumulative distribution function where we would declare that if we saw our sample mean had a value less than this of occuring, then our results were interesting enough to think that it may be unlikely that our sample came from a population with our null hypothesis's mean.
+
+The $\alpha$ level we are interested in for this test is 0.05. We call this a 95% confidence test because at the end of the experiment we could say that we are 95% confident that the true population mean fell within a specific interval. For reference, we typically use this level in statistics because of the data's domain, but in other fields, they may need to be much more confident than 95% to implement something they think may be significant. In medicine, there is greater risk to introducing new drugs so we want to be very sure that they are not dangerous and more effective. Now, because we are not testing whether the pH level is greater than, or less than, 7.0 specifically, we must use a two-sided test where we divide the $\alpha$ level across both tails so that we can test for the population mean for just being "different" from our predicted null population mean. We can estimate at what values in our t-distribution we reach both of our $\alpha/2$ levels by integrating the cumulative density frequency until we reach the desired probability and then return the value in the t-distribution that  lead to this cutoff point. We call these values are critical values because they are our cutoff points for the range in which we might expect our T-score to fall within during this test. If our resultant score of the T-test falls outside of this range, we have found significant results. We can simulate this in R by checking each value of our cumulative density function until we reach both tail $\alpha/2$ probability values and then, we can validate this by using R's qt function, which does the same thing but at a more precise scale:
+``` {r part1b}
+cdf.t <- pt((400:1600/100)-10, df =99)
+
+a <- 0.05
+
+plot((400:1600/100)-10,cdf.t)
+
+cat("Our critical values are about", 
+    (match(a/2, round(cdf.t,3), nomatch = NA_integer_)+400) / 100 - 10, "and",
+    (match(1-a/2, round(cdf.t,3), nomatch = NA_integer_)+400) / 100 - 10)
+
+cat("The critical values for our two-sided T distribution with an alpha level of",
+    a,"are,\n in truth,",-1*abs(qt(p=1-a/2, df=99)), "and",abs(qt(p=1-a/2, df=99)))
+```
+
+
+We have found our critical values. They tell us that 95% of the time, we would expect the sample mean to fall 1.984 standard deviations away from the mean based on our degress of freedom. Now, we can find our T-score, which reflects the score we assign the comparison of the hypothesized population mean to the sample mean, and then see whether it falls within, our outside of, our critical value range. If it falls outside, that means that given our population had the null hypothesis's mean, a result equal to or more extreme than our sample mean would occur with a probability less than or equal to $\alpha$. However, we fail to reject our null if our T-score falls within that range. Symbolically, the significant results would be the values found at the tails produced by our two cutoff points: $P(T \leq \alpha/2)$ and $P(T \geq \alpha/2)$.
+
+``` {r part2}
+x.bar <- 6.83
+null.mean <- 7
+std <- 0.3
+n <- 100
+    
+t.score <- (x.bar - null.mean)/(std/sqrt(n))
+cat("The T score was:",t.score)
+```
+
+As you can see from the R code output above, our T-score was outside of the range of our critical values. For this reason, we have significant evidence to reject the null hypothesis that the population mean acidity had a pH level of 7.0 within our lake of interest.
+
+It is important to note that, although we reject the null hypothesis in this test, our value still occurs within our distribution, which implies that it would be possible for this event to occur, but it would be very unlikely. The error for this is called a Type I error, where we reject the null when actually we just got a very unlikely sample from our population. The probability of this event, or something more extreme, is called the p-value and we could find it if we were interested in doing so in the same way we did it for finding our critical value except we would be interested in finding $p$ instead of the value at that probability.
+
+Finally, if you are interested in what sample means would fail to reject our null hypothesis given the constant sample standard deviation, we can find the cutoff values for the range by plugging in our critical values on either end as a result of our T-score calculation and then, solve for the sample mean as follows:
+$$\text{Critical value}=\frac {\bar x - \mu} {s /\sqrt n}=\frac{\bar x-7.0}{0.3/\sqrt{100}}=\pm1.96$$becomes
+$$\bar x =(0.3/\sqrt{100})(\pm1.96)+7.0 $$
+```{r extra}
+cat("Our sample mean would have to fall between", (0.3/sqrt(100)) * -1.96 + 7,
+    "and", (0.3/sqrt(100)) * 1.96 + 7, "for us to fail to reject\n our null.")
+```
+
+We would have not found significant results if our sample mean fell within the range of pH levels from 6.9412 and 7.0588. The opposite of this is called our confidence interval, which is the values that we would expect our population mean to fall within 95% of the time based on our sample. We will not calculate this for the project, but we can infer that 7.0 was not a pH level found within our interval of potential population means because we found significant results in our test. 
+
+
+## Conclusion
+As a result of our 95% confidence two-sided t-test, we found that there was significant evidence to conclude that the population mean pH level of our lake of interest was not 7.0 based on the sample we drew from the lake. We dissected how to acheive this value as well, as the critical values that signified our bounds before finding significant results, by using the probability density function and cumulative density function of our t-distribution. Finally, we shared more probable means based on the sample we drew that would have lead us not to reject our null hypothesis. These means fall within the interval of pH levels from 6.9412 and 7.0588. Our sample mean of 6.83 is far away from this interval, we reassures us that this sample would be unlikely to be drawn from a lake that had a population mean pH level of 7.0.
+

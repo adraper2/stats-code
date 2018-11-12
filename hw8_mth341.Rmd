@@ -1,0 +1,249 @@
+---
+title: "MTH 341 - HW8"
+author: "Aidan Draper"
+date: "11/7/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(rmutil)
+```
+
+## Homework 8
+Page 320: #4, 5, 9, 10, 18, 34
+
+
+#### Question 4:
+For starters, $X \sim \text{Bin}(2,1/2)$; $Y = \begin{cases}1 & \text{HH or TT},\\0 & \text{otherwise.} \end{cases}$. 
+
+a) The joint $\text{PMF}_{XY}$ can solved by creating a table where the probabilities exist as follows:
+
+```{r q4a, echo=FALSE}
+joint.pmf <- matrix(rbind(c("X=0", "X=1", "X=2", "Total"),
+                          c("0", "1/2", "0", "1/2"), 
+                          c("1/4", "0", "1/4", "1/2"),
+                          c("1/4", "1/2", "1/4", "4/4")),
+                    ncol=4, 
+                    byrow=TRUE)
+
+
+#rownames(joint.pmf) <- c("X=0", "X=1", "X=2", "Total")
+colnames(joint.pmf) <- c("_","Y=0", "Y=1", "Total") 
+
+
+
+kable(joint.pmf)
+```
+
+
+(This is valid because it sums to 1.)
+
+b) The marginal PMFs of $X$ and $Y$ can be found by summing the row values for $Y$ and summing the column values for $X$ in our original joint PMF table.
+
+Marginal $\text{PMF}_X=$
+```{r q4b, echo=FALSE}
+joint.pmf <- matrix(rbind(c("X=0", "X=1", "X=2", "Total"),
+                          c("1/4", "1/2", "1/4", "4/4")),
+                    ncol=2, 
+                    byrow=TRUE)
+
+
+#rownames(joint.pmf) <- c("X=0", "X=1", "X=2", "Total")
+colnames(joint.pmf) <- c("_","_") 
+
+
+
+kable(joint.pmf)
+```
+
+Marginal $\text{PMF}_Y=$
+```{r q4ba, echo=FALSE}
+joint.pmf <- matrix(rbind(c("_", "1/2","1/2", "4/4")),
+                    ncol=4, 
+                    byrow=TRUE)
+
+
+#rownames(joint.pmf) <- c("X=0", "X=1", "X=2", "Total")
+colnames(joint.pmf) <- c("_","Y=0", "Y=1", "Total") 
+
+
+
+kable(joint.pmf)
+```
+
+c) To check if $X$ and $Y$ are independent, we can see if, for any two points $(x,y)$ within the joint $\text{PMF}_{XY}(x,y)$, the probabilitty $P_X(x)*P_Y(y)$ is equivalent to $\text{P}_{XY}(x,y)$.
+
+Now, lets check $(0,0)$. $P_{XY}(0,0)=0\neq(1/4)(1/2)=P_X(0)*P_Y(0)$, which already tells us that $X$ and $Y$ are dependent.
+
+d) The conditional PMFs are computed as follows:
+
+In general, $P_{X|Y}(x,y)=\frac{P_{XY}(x,y)}{P_Y(y)}$. However, we can break this down into tables dependent on what our given $y$ value is.
+
+$\text{PMF}_{X|Y}(x,0)=$
+```{r q4da, echo=FALSE}
+joint.pmf <- matrix(rbind(c("X=0", "X=1", "X=2", "Total"),
+                          c("0", "1", "0", "1")),
+                    ncol=2, 
+                    byrow=TRUE)
+
+colnames(joint.pmf) <- c("_","Y=0") 
+kable(joint.pmf)
+```
+
+$\text{PMF}_{X|Y}(x,1)=$
+```{r q4db, echo=FALSE}
+joint.pmf <- matrix(rbind(c("X=0", "X=1", "X=2", "Total"),
+                          c("1/2", "0", "1/2", "1")),
+                    ncol=2, 
+                    byrow=TRUE)
+
+colnames(joint.pmf) <- c("_","Y=1") 
+kable(joint.pmf)
+```
+
+In both cases, we normalize the row values by the total of the Y column that has occured because this total represents our new sample space of 1.
+
+This is equivalent to: $$\text{PMF}_{X|Y}(x,0)=\frac{P_{XY}(x,0)}{P_Y(0)}=\frac{0}{1/2}+\frac{1/2}{1/2}+\frac{0}{1/2}=1 \text{, and }$$
+$$\text{PMF}_{X|Y}(x,1)=\frac{P_{XY}(x,1)}{P_Y(1)}=\frac{1/4}{1/2}+\frac{0}{1/2}+\frac{1/4}{1/2}=1.$$Similarly, we can use this same approach to get $\text{PMF}_{Y|X}(y,x)$:
+
+$$\text{PMF}_{Y|X}(y,0)=\frac{P_{XY}(0,y)}{P_X(0)}=\frac{P_{XY}(0,0)}{P_X(0)}+ \frac{P_{XY}(0,1)}{P_X(0)}=\frac{0}{1/4}+\frac{1/4}{1/4}=1 \text{, and }$$
+$$\text{PMF}_{Y|X}(y,1)=\frac{P_{XY}(1,y)}{P_X(1)}=\frac{P_{XY}(1,0)}{P_X(1)}+ \frac{P_{XY}(1,1)}{P_X(1)}=\frac{1/2}{1/2}+\frac{0}{1/2}=1 \text{, and }$$
+$$\text{PMF}_{Y|X}(y,2)=\frac{P_{XY}(2,y)}{P_X(2)}=\frac{P_{XY}(2,0)}{P_X(2)}+ \frac{P_{XY}(2,1)}{P_X(2)}=\frac{0}{1/4}+\frac{1/4}{1/4}=1.$$
+As we can see, every conditional $\text{PMF}_{Y|X}$ for a given $X$ is either 0 or 1, which is expected for the output of an independent r.v. that is dependent on our $X\sim\text{Bin}(2,1/2)$ imitating two fair coin flips.
+
+
+#### Question 5:
+Let $X$ be the result of a fair die roll and Y be the number of times a coin lands Heads out of the resultant die roll flips.
+
+This is also just $X \sim\text{DUnif}(1,...,6)$ and $Y \sim \text{Bin}(X,p)$.
+
+a) Find the joint $\text{PMF}_{XY}$.
+
+
+```{r q5, echo=FALSE}
+joint.pmf <- matrix(rbind(c("X=0", "X=1", "...", "X=6", "Total"),
+                          c("(1-p)/6", "p/6", "...", "0","1/6"),
+                          c("(1-p)^2/6", "p(1-p)/6", "...", "0","1/6"),
+                          c("...", "...", "...", "...","..."),
+                          c("(1-p)^6/6", "p(1-p)^5/6", "...", "p^6/6","1/6")
+                          ),
+                    ncol=5, 
+                    byrow=TRUE)
+
+colnames(joint.pmf) <- c("_","Y=1", "Y=2", "...", "Y=6") 
+kable(joint.pmf)
+```
+
+This is the joint $\text{PMF}_{XY}$ in table form, with a big section in the middle missing. In general, the joint PMF exists where $y \leq x$ and is generally equal to $(1/6)(1-p)^{x-y}p^y$ ${x}\choose{y}$.
+
+b) Find the marginal PMFs.
+
+The PMF of X is just the sum of all the $y$ columns, or $1/6$ for X from 1 to 6 as we showed in the totals.
+
+The PMF of Y is the sum of all the rows across each y column in the joint table.
+
+c) Find the conditional PMFs. 
+
+The conditional $\text{PMF}_{Y|X}(j,k)$ is just ${j}\choose{k}$, which we evaluated as a part of (a).
+
+The conditional $\text{PMF}_{X|Y}(k,j)$, on the other hand, is not as straightforward, but can be solved using Bayes' theorem: $\frac{\text{PMF}_{X|Y}}{\text{PMF}_{Y}}$, which we were told was enough of a final answer during class.
+
+#### Question 9:
+$X$ and $Y$ are iid $\text{Geom}(p)$. $N \sim X+Y$.
+
+a) Find the joint $\text{PMF}_{XYN}$.
+
+This would be really hard to write in table form so instead we are going to express it as the summation of the $\text{PMF}_{N}$ over the conditions $\text{PMF}_{X}$ and $\text{PMF}_{Y}$.
+
+For starters, lets just iron out the $\text{PMF}_{XY}=\text{PMF}_{X}*\text{PMF}_{Y}$ because X and Y are iid. Second, $\text{PMF}_{N} = X+Y$ is also equal to $\text{NBin}(2, p)$ because if X was the count of trials before our first success and, similarly, Y is the count of trials before another success. Therefore, the addition of these two stories leads us to the count of trials before two successes, which is also defined by the Negative Binomial distribution where $r$ is equal to 2.
+
+Now, using the conditional probability, we can express the joint $\text{PMF}_{XYN}$ as:
+$$\text{PMF}_{XYN} = \text{PMF}_{N|XY}\text{PMF}_{XY}$$
+As it turns out, $\text{PMF}_{N|XY}$ is actually just an indicator r.v. such that it is definied as 1 where n, or x+y, exists for values greater than or equal to 0, which makes sense since n is the combination of trials and we cannot have negative trials, and 0 otherwise. 
+
+Therefore, the combination, $\text{PMF}_{N|XY}\text{PMF}_{XY}$, is just equivalent to $1 * (1-p)^{x+y}p^2$ under the conditions they both share: $x+y=n \text{ and } x\geq0 \text{ and }y\geq 0$. Otherwise, it has a probability of 0. This can be expressed as a piecewise as follows: $$\text{PMF}_{XYN}=\begin{cases}(1-p)^{x+y}p^2 & x+y=n \text{ and } x\geq0 \text{ and }y\geq 0\\0 & otherwise. \end{cases}$$
+
+b) What is the joint $\text{PMF}_{XN}$?
+
+Using LOTP, we can use the summation of our previous joint distribution $\text{PMF}_{XYN}$ with respect to $y$.$\sum_y\text{PMF}_{XYN}(x,y,n)=\text{PMF}_{XN}(x,n)$ because the summation of the probabilities at the $y$ values equals 1. Because $N$ is completely dependent on $X$, it turns out that their joint distribution is: $$\text{PMF}_{XN}=\begin{cases}(1-p)^{n}p^2 & x\leq n \text{ and } x\geq0 \text{ and }n\geq 0\\0 & otherwise. \end{cases}$$This is equivalent to $\text{NBin}(2,p)$. This makes sense because the total count of the trials for the negative binomial is dependent on the number of trials of failures for the geometric distribution, $X$. Joining the two introduces no new joint probabilities of values.
+
+c) What is the conditional $\text{PMF}_{X|N}$?
+
+$\text{PMF}_N=\sum_x\text{PMF}_{NX}=q^np^2\sum^{n-1}_{k=1}1=q^np^2(n-1)$
+
+$$\text{PMF}_{X|N}=\frac{\text{PMF}_{XYN}}{\text{PMF}_{N}}=\frac{(1-p)^{n}p^2}{(n-1)(1-p)^{n}p^2}=\frac{1}{n-1}$$In simple terms, this random variable has a discrete uniform distribution where each value of $X$ has a $\frac{1}{n-1}$ probability of occuring for any $x$ less than or equal to $n$ from 0 to $n$.
+
+\textbf{Note:} I know that this is how we solved it in class, but aren't we overcounting n by 2 because the PMF of a $\text{NBin}(2,p)=(1-p)^{n-2}p^2$. Are we not confusing the variable $n=x+y$ with the arbitrary value we use in a the negative binomial PMF?
+
+#### Question 10:
+
+Let X and Y be iid Expo$(\lambda)$ and $T=X+Y$.
+
+a) Find the conditional $CDF_{T|X}.$
+
+We can actually use algebra to put this coniditional PDF in terms of our $CDF_Y$ that way we can just evaluate it within an r.v. we already have. This is done as follows:
+$$CDF_{T|X}(T\leq t|X=x)=CDF_{T|X}(X+Y\leq t|X=x)$$since we know what $X$ is equal in this scenario, we can equate it to little x. 
+$$CDF_{T|X}(X+Y\leq t|X=x)=CDF_{T|X}(x+Y\leq t)$$As it turns out, this is actually now in terms of Y, not T or X. Therefore, we can use the CDF of Y now. Our answer is just $CDF_{T|X}=CDF_Y(Y \leq t-x)$, where $t-x$ is our bound on the CDF.
+
+We can express this peicewise-defined: $$\text{CDF}_{T|X}=\begin{cases}1-e^{-(t-x)\lambda} & t-x \geq 0,\\0 &\text{otherwise.}\end{cases}$$
+
+b) Find the conditional $PDF_{T|X}$ and verify that it is valid.
+
+We can do this by simply differentiating the $CDF_{T|X}$, which is just an exponential distribution where our standard arbitrary $x$ value is equal to $t-x$ instead. This equals:
+$$\text{PDF}_{T|X}=\frac{\partial \text{ CDF}_{T|X}(t|x)}{\partial t}=\begin{cases}\lambda e^{-(t-x)\lambda} & t-x \geq 0,\\0 &\text{otherwise.}\end{cases}$$
+To validate, we must prove that it is nonnegative and sums to 1. Neither $e$ nor $\lambda$ will be negative given any input so we can cross that off. Because $t-x$ could be any arbitrary value in a standard exponential distribution as it is defined in our peicewise, we can skip the summation as well because the PDF of an exponential distribution, Exp($\lambda$), will always integrate to 1 from $-\infty$ to $\infty$. 
+
+\textbf{Note:} I attempted to also show this in R, but struggled with symbolic integration... It may be time to switch to Mathematica.
+
+c) Find the $\text{PDF}_{X|T}$ and verify that it is valid.
+
+We can solve the $\text{CDF}_{X|T}$ by using similar algebra to part (a). 
+$$\text{CDF}_{X|T}(x,t)=\text{CDF}(X \leq x|T=t)=\text{CDF}(X \leq x|X+Y=t)$$Now, by equating $X$ to $t-Y$, we can substitute it as our given to once again get our $\text{CDF}_{X|T}$ in terms of $\text{CDF}_Y$ as follows:
+$$\text{CDF}(X \leq x|X+Y=t)=\text{CDF}(X \leq x|X=t-Y)=\text{CDF}(t-Y \leq x)$$If we subtract $t$ from $Y$, negate the function and subtract it from 1, then, we have isolated our $Y$.
+$$\text{CDF}(t-Y \leq x)=\text{CDF}(-Y \leq x-t)=1-\text{CDF}(Y \leq t-x)$$Finally, if we take the partial derivative with respect to $x$. We can get our desired $\text{PDF}_{X|T}$.
+$$\text{PDF}_{X|T}=1-\frac{\partial \text{ CDF}_Y(t-x)}{\partial x}=1-\begin{cases}1-\lambda e^{-(t-x)\lambda} & t-x \geq 0,\\0 &\text{otherwise.}\end{cases}$$Again, we can validate this by integrating from $-\infty$ to $\infty$, but unfortunately, I cannot do this with symbolic integrations (because of Lambda) in R. That being said, $\int^\infty_{-\infty}\text{PDF}_{X|T}=1$ is true.
+
+d) Find the $\text{PDF}_T$.
+
+We can prove $\text{PDF}_T=\lambda^2 te^{-\lambda t}$ for $t \geq 0$ by using the continuous form of Bayes' rule on our r.v.s as follows:
+$$\text{PDF}_T=\int^\infty_{-\infty}\text{PDF}_{T|X}\text{PDF}_Xdx$$
+Again, if I had Mathematica, I could actually attempt to symbollically integrate this with respect to x. Regardless, the integration leads us to $\text{PDF}_T=\lambda^2 te^{-\lambda t}$ for $t \geq 0$ because the $x$ goes away in our $\text{PDF}_{T|X}$, but we are left with a single $t$ and an extra $\lambda$ when you integrate the two PDFs together.
+
+#### Question 18:
+
+Let $(X, Y)$ be a uniformly random point in the triangle in the plane with vertices (0,0), (0,1),(1,0). Find the joint $\text{PDF}_{XY}$, the marginal $\text{PDF}_{Y}$ and $\text{PDF}_{X}$, and the conditional $\text{PDF}_{X|Y}$.
+
+In my opinion, the joint is the hardest to rationalize, but, after analyzing a similar example from Figure 7.6 on page 292, it became much more apparent to me that a general rule for finding the joint PDF of any uniformly distributed areas within cartesian planes can be generalized as $\int_{\text{Region}}f_{XY}d\text{Region}=k*area(\text{Region})=1$ for any 2-dimensional area with a constant, k. In the case of the example, the area of a circle with a radius of 1 was $\pi$, which means k had to be $1/\pi$ for the equation to equal 1. Similarly, for a triangle, we can use this as follows: $1=k*1/2bh=>1=k(1/2)(1)(1)=>1=k(1/2)=>2=k$. Therefore, for any $(x,y)$ within our region, $\text{PDF}_{XY}=2$. This is piecewise-defined as follows:
+$$\text{PDF}_{XY}=\begin{cases}2,&(x,y) \in \text{Region}\\0, &otherwise. \end{cases}$$
+
+The marginal $\text{PDF}_{X}$ can be found by integrating our joint PDF with repsect to y as follows:
+$$\text{PDF}_{X}=\int^{1-x}_0\text{PDF}_{XY}dy=\int^{1-x}_02dy$$This can be simplified to $\text{PDF}_{X}=2(1-x)$.
+
+The marginal $\text{PDF}_{Y}$ is actually because they are symmetric. $$\text{PDF}_{Y}=\int^{1-y}_0\text{PDF}_{XY}dx=\int^{1-y}_02dx$$This can be simplified to $\text{PDF}_{Y}=2(1-y)$.
+
+Finally, the conditional $\text{PDF}_{X|Y}$ is probably the nicest. It is simply equivalent to $\frac{\text{PDF}_{XY}}{\text{PDF}_{Y}}$. This plugs in nicely and becomes $\frac{2}{2(1-y)}=\frac{1}{1-y}.$
+
+#### Question 34:
+Find Cov(X,Y) of the varible from 18.
+
+For starters, the covariance between two random variables, X and Y, is defined as: $\text{Cov}(X,Y)=E(XY)-E(X)E(Y).$ The expected value of $E(X)=\int\int_{\text{Region}}2xdxdy$. Due to symmetry, our $E(Y)$ is just $\int\int_{\text{Region}}2ydxdy$ where our Region is the triangle.
+
+Using 2D LOTUS, we can find $E(XY)$ as follows: $$E(XY)=\int^{1}_{0}\int^{1-x}_{0}xyf_{XY}dxdy$$
+Finally, $\text{Cov}(X,Y)=E(XY)-E(X)E(Y) =$
+```{r q34}
+x <- function(x) {x*(2-2*x)}
+ex <- integrate(x, lower=0, upper=1)$value
+y <- function(y) {y*(2-2*y)}
+ey <- integrate(y, lower=0, upper=1)$value
+
+cat("EX and EY both equal", ey)
+
+exy <- 1/2 
+# I could not compute in R, but I used wolfram alpha to integrate fxy with repsect 
+# to x and y
+
+cov.xy <- exy - ex*ey
+cat("Cov(X,Y) is equal to",cov.xy)
+```

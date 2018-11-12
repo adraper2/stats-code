@@ -1,0 +1,64 @@
+---
+title: "MTH 341 - HW7"
+author: "Aidan Draper"
+date: "10/31/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(ggplot2)
+require('greybox')
+```
+
+## Homework 7
+Page 238: #46, 53
+
+#### Question 46:
+The \textit{Laplace distribution} has PDF $$f(x)=\frac{1}{2}e^{-|x|}$$for all real $x$. The Laplace distribution is also called a \textit{symmetrized Exponential distribution}. Explain this in the following two ways.
+
+(a) Plot the PDFs and explain how they relate.
+
+```{r q46a}
+x <- seq(-10, 10, length.out=1000)
+exp.pdf <- data.frame(x=x, px=dexp(x, rate=1/2))
+ggplot() +
+  geom_line(data=exp.pdf, aes(x=x, y=px, color="blue")) +
+  geom_line(aes(x=x, y=dlaplace(x,mu=0, b=1), color = "red")) +
+  scale_colour_manual(name = 'PDFs', 
+         values =c('blue'='blue','red'='red'), labels = c('Exponential','Laplace'))
+
+```
+
+\textit{These distributions look very similar at first glance. They are both conververing on 0 as they approach infinite limits. However, the Exponential distribution only exists where $x \geq 0$, while the Laplace distribution appears to exist as $-\infty \leq x \leq \infty$. The peak of the both the exponential distribution and the Laplace distribution is at (0, 0.5). My intuition is that if you bounded the Laplace distribution to $x \geq 0$, you would have 1/2 the $p(x)$ of the Exponential distribution for $P(X \leq x)$ as you appraoched $\infty$. Therefore, the Laplace distribution could be considered an Exponential distributions that has been split such that half of its sample space now exists below 0, at the -x values, as well.}
+
+(b) Let $X \sim Expo(1)$ and $S$ be a random sign (1 or -1, with equal probabilties), with $S$ and $X$ independent. Find the PDF of $SX$ (by first finding the CDF), and compare the PDF of $SX$ and the Laplace PDF.
+
+\textit{Becuase $S$ is a 1 or -1 with equal probability, we can express this as a distrcete uniform with the set $C$ of -1 and 1. Both values have a probability of 0.5 of occuring. We can express the CDF of this probability and break it down by conditioning on the two values of S as follows: $$P(SX \leq a)=P(SX\leq a|S=-1)P(S=-1) + P(SX\leq a|S=1)P(S=1).$$Now, because $S$ has set values in our conditional equation, $S$ becomes a constant and our equation above is equivalent to: $$P((-1)X\leq a|S=-1)P(S=-1) + P((1)X\leq a|S=1)P(S=1).$$Finally, due to their independence and because of the definition of conditional independence of r.v.s our conditioning goes away: $$P(-X\leq a)P(S=-1) + P(X\leq a)P(S=1) = P(-X\leq a)(1/2) + P(X\leq a)(1/2).$$ Finally, we can get a tangible CDF using some algebra on our $P(-X\leq a)$: $$F(a)=1 - P(X\leq -a)(1/2) + P(X\leq a)(1/2).$$To get our PDF, we find $F'(a).$ Our negative one goes away and we just end up having to derivate the summation of two exponential distributions, one with $-\lambda$ and the other with regular $\lambda$. Then, it becomes apparent that our PDF is a piecewise defined as follows: $$f(x) =\begin{cases} e^{-x}(1/2) & \text{if } x \leq 0,\\e^{x}(1/2) & \text{if } x \geq 0.\end{cases}$$because the PDF of $\text{Exp}(\lambda)=0$ when x is greater than or equal to 0 and the PDF of $\text{Exp}(-\lambda)=0$ when x is less than or equal to 0.}
+
+#### Question 53:
+Let $X$ be an r.v. (discrete or continuous) such that $0 \leq X \leq 1$ always holds. Let $\mu=E(X).$ 
+
+(a) Show that $$\text{Var}(X) \leq \mu - \mu^2 \leq \frac{1}{4}.$$Hint: With probability 1, we have $X^2 \leq X.$ 
+
+\textit{For starters, because X is constricted to the range 0 to 1, it turns out that $X^2$ will actually always be less than or equal to $X$ because a decimal squared is always less than its original value. Normally, our variance can be calculated as $EX^2 - (EX)^2$, however, we are bounded to cases wehre $EX^2 \leq EX$, which would imply negative variances. For this reason, we must use the case where $EX^2 = EX = \mu$, which would also make our variance $\mu-\mu^2$ for some unknown distribution that has values within our range, 0 to 1. Finally, we can find out the maximum of our calculated formula using R. We simulate some potential variances of our distribution with $0 \leq X \leq 1$ by plugging in every possible mean from 0 to 1 incrementing by 0.01.}
+
+```{r q53a}
+mean.x <- 0:100/100
+variance.x <- length(mean.x)
+
+for(i in 1:length(mean.x)){
+  variance.x[i] <- mean.x[i] - mean.x[i]^2
+}
+
+ggplot()+geom_line(aes(x=mean.x,y=variance.x))
+
+cat("The max value our variance could take is", max(variance.x), 
+    "\nwhere our mean is equal to", mean.x[match(max(variance.x),variance.x)])
+```
+\textit{As we can see above, we were able to prove that our variance will equal 1/4 at its maximum and, in all other cases, it will be less than that.}
+
+
+(b) Show that there is only one possible distribution for $X$ for which $\text{Var}(X)=1/4.$ What is the name of this distribution?
+
+\textit{The only distribution we could have is one where $X=X^2$ because this is our "bound" where our variance is equal to 1/4 from the "less than or equal"" variance scenario we described in (a). This would have to be a $DUnif(0,1)$ because, for both values 0 and 1, their squared value is themself. To prove this is also a case where our Var(X) is equal to: $\mu - \mu^2 = 1/4$, lets look at our EX. Our expected value of a $DUnif(0,1)$ is equal to $0(0.5) + 1(0.5)=0.5$, which would make our variance $1/2-(1/2)^2=1/4$. Thus, we have validated our choice of distribution.}

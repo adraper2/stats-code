@@ -1,0 +1,190 @@
+---
+title: "MTH 341 - HW6"
+author: "Aidan Draper"
+date: "10/22/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require('Ryacas')
+```
+
+## Homework 6
+Page 231: #1, 5, 8, 9, 10, 14, 23
+
+### PDFs and CDFs
+
+#### Question 1:
+The Rayleigh distribution from Example 5.1.7 has PDF $$f(x)=xe^{-x^2/2}, x > 0.$$Let $X$ have the Rayleigh distribution. 
+
+(a) Find $P(1<X<3)$.
+
+\textit{To find the probability of our Rayleigh distribution within the range of 1 to 3, we need to first get the integral of our PDF and then plug in the continuous range from 1 to 3 in order to get the area under that range of the CDF slope. This is done in R below.}
+```{r q1a}
+e <- exp(1)
+rayleigh <- function(x) {x*(e^((-(x)^2)/2))}
+integrate(rayleigh, lower = 1, upper = 3)
+```
+
+(b) Find the first quartile, median, and third quartile of $X$; these are defined to be the values $q_1, q_2, q_3$ (respectively) such that $P(X\leq q_j)=j/4$ for $j=1,2,3.$
+
+\textit{When we have our desired proprotions for the area under the slope, it seems rather easy in mathematica to reverse engineer our equation to spit out our desired upper bound (1/4,2/4 or 3/4) for the CDF. That being said, I had to develop a much more conveluted approach in R after researching how people evaluated continuous r.v.s in R at other universities. The best solution I could find was to use the Vectorize function, which allows us to build a CDF of an r.v. in R without declaring any value to our input "z" at runtime. z represents the upper bound that would create a range of our CDF from 0 to z that yields one of our three quartiles. Then, I ran a sequence of values from 0 to 1 incrementing by 0.001 and rounded the resultant integral value at that upper bound until it yielded our desired "j". I chose 5 as a maximum upper bound because the values quickly approach a probability of 1 in the PDF as the upper bound reaches 5 so I knew we would not need any higher values. I used the match function to find the index of the values that rounded to equal "0.250" and then normalized the index to its proper value. I am curious how other students using R solved this.}
+```{r q1b}
+integral <- Vectorize(function(z) integrate(rayleigh, lower = 0, upper = z)$value) #oh my!
+
+j <- c(.250,.500,.750) # the desired j values
+
+# this is a little too complicated to do in R...
+estimate.of.upper <- match(j, round(integral(seq(0:5000)/1000),3))/1000
+
+cat("The first quartile of our PDF is approximately: ",estimate.of.upper[1], 
+    "\nThe second quartile of our PDF is approximately: ",estimate.of.upper[2],
+    "\nThe third quartile of our PDF is approximately: ",estimate.of.upper[3])
+
+# check if this overly complex approach worked
+integral(estimate.of.upper)
+```
+
+
+#### Question 5:
+A circle with a random radius $R \sim \text{Unif}(0,1)$ is generated. Let A be its area.
+
+(a) Find the mean and variance of $A$, without first finding the PDF or CDF of $A$. 
+
+\textit{The area of a circle is $\pi r^2$. As we saw in example 5.2.4 of the reading, we can use the definition of expectation for continuous random variables, $\int_{a}^{b}x*pdf(x)dx$, to explain continuous uniform random variables. It turns out that we do not even need to calculate the PDF of for this formua though because it equates to 1 using the formula $\frac{1}{b-a}$, which equals $\frac{1}{1-0}=1$ and can be ignored. Therefore, our integral is just $\int_{a}^{b}xdx $, except our value is not just the midpoint of a and b because the r.v. is the radius of a circle. Therefore, we must transform it such that our x represents the area of the cirlce $\int_{a}^{b}(\pi x^2) dx =\pi \int_{a}^{b}x^2 dx$. Now, we know that $\int_{0}^{1}x^2 dx$ is just 1/3 so our expected value is $EX =\pi \int_{0}^{1}x^2dx = \pi * 1/3=\pi/3$.}
+
+\textit{Our variance can be calculated using LOTUS, but requires the calculation of $EX^2$ first. $EX^2=\int_{0}^{1}(\pi x^2)^2 pdf(x)dx = \int_{0}^{1}(\pi x^2)^2dx=\pi^2\int_{0}^{1}x^4dx=\pi^2/5$. Now, $Var(X)=EX^2-(EX)^2=\pi^2/5-(\pi/3)^2=$ (finished calculation in R below).}
+```{r q5a}
+var.x <- ((pi^2)/5) - ((pi/3)^2)
+cat("The variance is:", var.x)
+```
+
+(b) Find the CDF and PDF of $A$.
+
+\textit{For starters, our PDF is simply a peiecewise that states $$f(x) =\begin{cases} \frac{1}{b-a} & \text{if } a < x <b,\\0 & \text{otherwise.}\end{cases} =\begin{cases} \frac{1}{1-0} & \text{if } 0 < x <1,\\0 & \text{otherwise.}\end{cases}$$so our piecewise states that our PDF is 1 between 0 and 1 and 0 otherwise. Our CDF is also a piecwise defined as $$F(y) =\begin{cases} 0 & \text{if } y \leq a,\\\frac{y-a}{b-a} & \text{if } a < y <b,\\1 & \text{if }y \geq b\end{cases} =\begin{cases} 0 & \text{if } y \leq 0,\\\frac{y-0}{1-0} & \text{if } 0 < y <1,\\1 & \text{if }y \geq 1\end{cases}$$This implies that our CDF is just the accumulation of probabilities equal to the y value itself within the range of 0 and 1, i.e., $P(A \leq a) = a$ within the range of values 0 and 1.}
+
+
+#### Question 8
+The \textit{Beta distribution} with parameters $a=3, b=2$ has PDF $$f(x)=12x^2(1-x), \text{ for }0<x<1,$$(We will discuss the Beta distribution in detail in Chapter 8.) Let $X$ have this distribution.
+
+(a) Find the CDF of X.
+
+\textit{In order to to find the CDF of the Beta Distribution. We simply integrate the PDF.}
+```{r q8a}
+x <- Sym("x")
+beta.pdf <- function(x) {12*(x^2)*(1-x)}
+
+# yacas is a package that evaluates symbolic functions in R
+beta.cdf <- yacas(Integrate(beta.pdf(x),x))
+beta.cdf
+```
+
+(b) Find $P(0<X<1/2).$
+
+\textit{Similar to how to found the range for the Rayleigh function in question 1, we can find the probability of our Beta Distribution in the range 0 to 1/2 by taking the integral of our PDF to get the CDF and then finding the bounds of our CDF such that we are searching for the cumulative probability, $P(X\leq1/2)$.}
+```{r q8b}
+integrate(beta.pdf, lower = 0, upper = 1/2)
+```
+
+(c) Find the mean and variance of $X$ (without quoting results about the Beta distribution).
+
+\textit{Using the definition of expectation for continuous random variables, $\int_{a}^{b}x*pdf(x)dx$, we can find our expected value. From there, we can calculate $EX^2$, which is equal to $\int_{a}^{b}x^2*pdf(x)dx$. Once we have $EX^2$, we just have to subtract $(EX)^2$ from $EX^2$ to get our variance. This is done below in R.}
+```{r q8c}
+pdf.times.x <- function(x) {x*(12*(x^2)*(1-x))}
+# you cannot integrate from -infinity to infinity so I used the valid range
+beta.EX <- integrate(pdf.times.x, lower = 0, upper = 1)$value
+cat("The expected value of our Beta distribution is:", beta.EX)
+
+pdf.times.x2 <- function(x) {(x^2)*(12*(x^2)*(1-x))}
+beta.EX2 <- integrate(pdf.times.x2, lower = 0, upper = 1)$value
+
+beta.var <- beta.EX2 - beta.EX^2
+cat("The variance of our Beta distribution is:", beta.var)
+```
+
+
+#### Question 9
+The \textit{Cauchy distribution} has PDF $$f(x)=\frac{1}{\pi(1+x^2)},$$for all $x$. (We will introduce the Cauchy from another point of view in Chapter 7.) Find the CDF of a random variable with a Cauchy PDF.
+
+Hint: Recall that the derivative of the inverse tangent function $tan^{-1}(x) \text{ is }\frac{1}{1+x^2}.$
+
+\textit{To find the CDF of the Cauchy distribution, we must integrate its PDF. Based on the hint given, we know that the integral of $tan^{-1}(x) \text{ is }\frac{1}{1+x^2}.$ $\pi$ in the denominator is a constant in our integral so we can move $1/\pi$ outside of our integral such that, $$F(x)=\frac{1}{\pi}\int_{-\infty}^{x}\frac{1}{1+u^2}du.$$ This becomes $$=\frac{1}{\pi}\Bigg[\frac{\pi}{2} + tan^{-1}(x)\Bigg]=\frac{1}{2}+\frac{tan^{-1}(x)}{\pi}$$
+```{r q9}
+x <- Sym("x")
+cauchy.pdf <- function(x){(1/pi)*(1/(1+x^2))}
+# attempt to integrate using R
+yacas(Integrate(cauchy.pdf(x),x))
+
+
+cauchy.cdf <- function(x){(1/2)+atan(x)/pi}
+curve(cauchy.cdf(x), -20,20)
+```
+
+
+### Uniform and universality of the Uniform
+
+#### Question 10
+Let $U \sim \text{Unif}(0,8).$
+
+(a) Find $P(U\in(0,2)\cup(3,7))$ without using calculus.
+
+The statement above is equivalent to the combined probabilities for the CDF in the two ranges 0 to 2 and 3 to 7, such that if $a < x < b$, then $F(x)=P(X\leq x) = \frac {x-a}{b-a}$. To make sure we properly capture this range using our CDF, I will use $$P(X\leq 7) - P(X\leq 3) + P(X\leq 2),$$which is equal to $$\frac{7-0}{8-0}-\frac{3-0}{8-0}+\frac{2-0}{8-0}=7/8-3/8+2/8=0.75.$$
+
+(b) Find the conditional probability of $U \text{ given } U \in (3,7).$
+
+\textit{We are trying to find $P(U \leq u |U \in(3,7)$. Proposition 5.2.3 in the textbook says that the conditional CDF, $P(U \leq u |U \in(c,d)$, simplifies to $\frac{u-c}{d-c}$, which means our CDF is $P(U\leq u)=\frac{u-3}{4}$. This also implies that the probability of any event inbetween our given range (3,7) is $f(x)=\frac{1}{b-a} =\frac{1}{7-3}= 1/4$.}
+```{r q10b}
+
+```
+
+#### Question 14
+Let $U_1,...,U_n$ be i.i.d. $\text{Unif}(0,1),$ and $X=max(U_1,...,U_n).$ What is the PDF of $X$? What is $EX$?
+
+Hint: Find the CDF of X first, by translating the event $X \leq x$ into an event involving $U_1,...,U_n.
+
+\textit{Based on the hint, I imagine that we should start with the CDF, $F(x)=P(X\leq x)$ for $0 \leq x \leq1$ of what our function X might have. That being said, it seems that the maximum of our n random variables must be less than or equal to x if they are all less than or equal to x. Essentially we have n probabilities x. The CDF of X is therefore the multiplication of all of these probabilities, $F(x)=x^n$. To get the PDF, we just need to take the derivative of our CDF (finally a derivative/integral I can solve in my head...), such that $F'(x)=nx^{n-1}$. The expected value is just $$EX=\int_{-\infty}^\infty xf(x)dx=\frac{nx^{n+1}}{n+1}.$$ However, we can actually plug in 1 for x when using Unif(0,1) because our range is from 0 to 1 instead of $-\infty$ to $\infty$. This simplifies our answer to $$\frac{n(1)^{n+1}}{n+1}=\frac{n}{n+1}.$$}
+```{r q14}
+
+```
+
+### Normal
+
+#### Question 23
+(a) Find the points of inflection of the $\mathcal{N}(0,1)$ PDF $\varphi,$ i.e., the points where the curve switches from convex (second derivative positive) to concave (second derivative negative) or vice versa.
+
+\textit{To find points of inflection in a curve, we can take the second derivative of that line and evaluate where the values of the second derivative equal 0. I could not get the symbolic second derivative of our normal distribution, but I can infer that it is $\frac{1}{\sqrt{2\pi}}e^{-z^2/2}(x^2-1)$ because if our normal distribution is described as $\varphi (x)$, it follows the property that its second derivative $\varphi''(x)=(x^2-1)\varphi(x)$. We can show where the points of inflection are using this formula in R below.}
+```{r q23a}
+# Function from user "Roland" on Stack Overflow
+DD <- function(expr, name, order = 1) {
+  if(order < 1) stop("'order' must be >= 1")
+  if(order == 1) D(expr, name)
+  else DD(D(expr, name), name, order - 1)
+}
+
+d2.norm <- function(x) eval(DD(expression(dnorm(x)), "x", order = 2))
+
+curve(d2.norm, -3, 3, ylim = c(-0.4, 0.4), col = 'red')
+curve(dnorm(x), -3,3, add=TRUE, col = 'blue')
+lines(-3:3,rep(0,7))
+```
+\textit{It appears that our second derivative crosses the x-axis around -1 and 1, which makes sense considering the value of sigma and what we know about the standard distribution. Lets check by indexing our second derivative at -1 and 1 in R.}
+```{r 23aa}
+d2.norm(c(-1,1))
+
+```
+\textit{So yes, there are inflection points at x is equal to -1 and 1. Our second derivative is convex from $-\infty$ to -1 and 1 to $\infty$, but concave from -1 to 1.}
+
+
+(b) Use the result of (a) and a location-scale transformation to find the points of inflection of the $\mathcal{N}(\mu,\sigma^2)$ PDF.
+
+\textit{In the process of answering a, I mentioned that we had infelction points at x is equal to -1 and 1. I will still show how these evaluate on our normal distribution so that we have the actual (x,y) coordinates.}
+```{r q23b}
+d1.norm <- function(x) eval(DD(expression(dnorm(x)), "x", order = 1))
+
+cat("Our infelction points are at (-1, ",dnorm(-1), 
+    ") and (1, " ,dnorm(1),").", sep="")
+```
+
+\textit{In order to perform a location-scale transformation to find these points of infelction for an arbitrary normal distribution, we must use Definition 5.4.3 from the textbook. This definition in the textbook states that if $X \sim \mathcal{N}(\mu,\sigma^2)$ then Z (our distribution from problem a) is equal to $$\frac{X-\mu}{\sigma}\sim \mathcal{N}(0,1).$$ Therefore, we can use $$E(\mu + \sigma Z) = E(\mu)+\sigma E(Z) = E(\mu)+\sigma(0)= \mu$$to get the mean and $$Var(\mu + \sigma Z)=Var(\sigma Z) = \sigma ^2Var(Z)=\sigma^2(1)$$ to get the variance. Our points of inflection shall always be at $\sigma$ so we can just take the square root of our expected variance to find the points of inflection. Therefore, our inflection points for $X \sim \mathcal{N}(\mu,\sigma^2)$ is $(-\sigma,f(-\sigma))$ and $(\sigma,f(\sigma))$.}
+
