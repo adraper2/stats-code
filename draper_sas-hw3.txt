@@ -1,0 +1,20 @@
+/* Aidan Draper */
+/* HW3 Hand in */
+
+data HW;
+input time;
+cards;
+189
+287
+199
+270
+276
+306
+206
+305
+110
+298
+;
+
+proc ttest data=HW alpha=.05;
+run;
