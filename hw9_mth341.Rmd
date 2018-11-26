@@ -1,0 +1,103 @@
+---
+title: "MTH 341 - HW9"
+author: "Aidan Draper"
+date: "11/15/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 9
+Page 320: #40, 54, 66, 70, 72
+
+#### Question 40:
+Let $X$ and $Y$ be i.i.d. Unif(0,1). 
+
+(a) Compute the covariance of $X+Y$ and $X-Y$.
+
+We can find the $\text{Cov}(X+Y,X-Y)$ by using linearity, and the property: $\text{Cov}(X,X)=\text{Var}(X)$ as follows:
+$$\text{Var}(X)=\text{Var}(Y)=\frac{a+b}{12}=\frac{0+1}{12}=1/12$$Then, we can break up our covariance into two pieces using linearity on the first part, $X+Y$:
+$$\text{Cov}(X+Y,X-Y)=\text{Cov}(X,X-Y)+\text{Cov}(Y,X-Y)$$Finally, using foiling we can algebraically break this down to:
+$$\text{Cov}(X,X-Y)+\text{Cov}(Y,X-Y)=\text{Cov}(X,X)-\text{Cov}(Y,X)+\text{Cov}(X,Y)-\text{Cov}(Y,Y)=1/12-1/12=0.$$
+We cancelled out the two middle covarainces because they are equal. As we can now see, the 0 implies that there is no relation between $X+Y$ and $X-Y$.
+
+
+(b) Are $X+Y$ and $X-Y$ independent?
+
+Now, having no relation does not tell us that they are independent. Lets call $X+Y$ and $X-Y$ A and B respectively. To check whether they are independent, we must see whether $\text{CDF}_{AB}=\text{CDF}_A*\text{CDF}_B$ or $\text{PDF}_{AB}=\text{PDF}_A*\text{PDF}_B$. Because we are using continuous r.v.s, we will have to use the CDF though. Using Mathematica, we can find the CDFs of A and B, which evaluate to a peicewise functions defined as: 
+$$F_A(a)=\begin{cases}0 & a \leq 0\\ 1/2a^2 &0 \leq a \leq 1\\1-\frac{(2-a)^2}{2} & 1 \leq a \leq 2 \\1 & a\geq2\end{cases}\hspace{1cm}\text{ and }\hspace{1cm}F_B(b)=\begin{cases}0 & b \leq -1\\ \frac{(1+b)^2}{2} &-1 \leq b \leq 0\\1-\frac{(1-b)^2}{2} & 0 \leq b \leq 1 \\1 & b\geq1\end{cases}$$
+
+Now, to prove they are not independent. We would just have to show that, at a single point, $\text{CDF}_{AB}\neq\text{CDF}_A*\text{CDF}_B$. Lets use $a=1/2$ and $b=-1/2$. As seen in figure 1, if we draw how they fill this theoretical box that represents our two Unif(0,1) r.v.s X and Y.
+
+![CDF Comparison for question 40b. (There is a bug which does not let me control the placement of this figure.)](hw9_img.png)
+
+As we can see, the joint CDF has no intersection at those two points, which means it equals 0. On the other hand, $F_A(1/2)=1/2(1/2)^2=1/8$ and $F_B(-1/2)=\frac{(1-1/2)^2}{2}=1/8$. 0 clearly does not equal (1/8)(1/8), which means X+Y and X-Y are dependent.
+
+\break
+\break
+
+#### Question 54:
+Let $U \sim \text{Unif}(-1,1)$ and $V=2|U|-1$.
+
+(a) Find the distribution of $V$.
+
+$P(V \leq v)$ is equal to $P(2|U|-1 \leq v)$, which we can put in terms of $u$ with the support [-1,1] as follows:
+$$P(2|U|-1 \leq v)=P(|U|\leq \frac{v+1}{2})=P(-(\frac{v+1}{2})\leq u \leq \frac{v+1}{2}).$$
+
+We can evaluate this in Mathematica, which gives us a peicewise defined function for $F_V(v)$:
+$$\begin{cases}0 & \frac{v+1}{2}\leq 0\\\frac{u+1}{2}& 0 \leq \frac{v+1}{2} \leq 1\\1 & \frac{v+1}{2} \geq 1\end{cases}$$ As it turns out, if we analyze the range that our CDF takes, it becomes apparent that our CDF will occupy space on an interval from a minimum of $-(\frac{v+1}{2})$ and a maximum of $\frac{v+1}{2}$. Then, if we subtract $-(\frac{v+1}{2})$ from $\frac{v+1}{2}$ to find our range, we are left with $2\frac{v+1}{2}=v+1$. Therfore we can simplify the bounds of our CDF to: $$\begin{cases}0 & v \leq -1\\\frac{u+1}{2}& -1 \leq v \leq 1\\1 & v \geq 1\end{cases}$$Then, taking the derivative in Mathematica gives us our PDF:
+$$f_v(v)=\begin{cases}0 & v \leq -1 \\ 1/2 & -1 \leq v \leq 1 \\ 1 &v \geq 1\end{cases}$$which is the same distribution as U. V and U share a the same distribution.
+
+(b) Show that $U$ and $V$ are uncorrelated, but not independent.
+Using conditional probability, we can manipulat the $\text{Cov}(U, 2|U|-1)$ as follows:
+$$\text{Cov}(U, 2|U|-1)=\text{Cov}(U, 2|U|-1|u \leq 0)P(u \leq 0)+\text{Cov}(U, 2|U|-1|u \geq 0)P(u \geq 0)$$This is equal to $$\text{Cov}(U, -2u-1)0.5+\text{Cov}(U, 2u-1)0.5$$when we plug in our u values. Then, we can pull out the 2 and -1 to get just $\text{Cov}(U, U)$ in one case: $$0.5(-2\text{Cov}(U, U)-\text{Cov}(U, 1))+0.5(2\text{Cov}(U, U)-\text{Cov}(U, 1))=0$$This equals 0 because the $2\text{Cov}(U, U)$ cancel out and we are just left with the covariance of u and a constant, which is always 0. Then, using Mathematica, we can check for dependence by plugging in values and seeing if $F_{UV}(u,v)=F_U(u)F_V(u)$ for some arbitrary u and v. As it turns out, we find U and V depdendent after guessing and checking $u=-1/2$ and $v =0$, which for $F_{UV}$ equals 0, but for $F_U$ it equals 1/4 and for for $F_V$ it equals 1/2. $0 \neq(1/4)(1/2)$.
+
+
+#### Question 66:
+(a) For starters, lets say that our r.v.s have probability of success $p_x, p_y, \text{ and }p_z$, which follow the rule that $p_x+ p_y +p_z =1$. Additionally, $<X, Y, Z> \sim\text{Multinomial}(n, <p_x,p_y,p_z>)$ and $n$ represents the total number of outcomes in $n_x, n_y,n_z$. Then, we can solve for our joint PMF by using the PMF of our Multinomial distribution above: $$\text{PMF}(n_x, n_y,n_z)=\begin{cases}\binom{n}{n_z}\binom{n_x+n_y}{n}p_x^{n_x}p_y^{n_y}p_z^{n_z} & n_x+n_y+n_z=n \&\&n_x,n_y,n_z\geq0\\0 & \text{otherwise.}\end{cases}$$ 
+(This was done in Mathmatica using by taking the PMF of the Multinomial Distribution with our parameters.)
+
+(b) Next, we want to consider sampling without replacement. This essentially follows three Hypergeometric distribution where the white balls selected are the underclassmen, junior and senior respectively for each distribution and then the black balls are the rest of the classes. So, we have HGeom(x,y+z,n), HGeom(y,x+z,n), and HGeom(z,x+y,n). As you can see, regardless of what we are selecting, n does not change as the sampled population. Therefore, we make a "Multi-hypergeometric" if we just keep each group seperate. In the Hypergeometric story, we may introduce a new colored ball (grey) as part of the story. Nonetheless, we end up with HGeom(x,y,z,n), which has a PMF: $$PMF_{XYZ}=\frac{\binom{x}{n_x}\binom{y}{n_y}\binom{z}{n_z}}{\binom{x+y+z}{n}}\text{ when } n_x+n_y+n_z \text{ are greater than or equal to 0 and equal n.}$$
+
+
+#### Question 70:
+(a) What is the joint PMF of $X_1$,$X_2$,$X_3$?
+
+We can use Mathematica simularily to how we used it in 66. $<X_1,X_2,X_3> \sim \text{Multinomial}(n,<p^2,2p(1-p),(1-p)^2>)$. Taking the PMF of this for three values $n_1,n_2,n_3$ gives us $$f_{X_1X_2X_3}=\binom{n_1+n_2}{n_2}2^{n_2}((1-p)^2)^{n_3}((1-p)p)^{n_2}(p^2)^{n_1} \hspace{0.5cm} \text{when } n_1, n_2, n_3 \geq 0 \text{ \& } n_1 + n_2 + n_3=n$$
+
+(b) What is the distribution of the number of people in the sample who have an $A$?
+
+Using lumping, we can use the same strategy above, but essentially simplify the Multinomial into a Binomial distribution as follows:
+$$<X_1+X_2,X_3> \sim \text{Multinomial}(n,<p^2+2p(1-p),(1-p)^2>)$$which simplifies to a normal Binomial distribution:
+$$X_1+X_2 \sim \text{Bin}(n, p^2+2p(1-p))$$which is our distribution.
+
+(c) What is the distribution of how many of the 2$n$ genes among the people are $A$'s?
+
+This problem is much more straightforward than the previous. We have the same distribution, except it is out of $2n$ and we have to multiply $X_1$ by 2 because $A$'s are found in two of the three genotypes. This equates to:
+$$2X_1+X_2 \sim \text{Bin}(2n, p).$$
+
+(d) Find the MLE of $p$.
+
+We are trying to find a value for $p$ that maximizes our PMF for $n_1,n_2,n_3$, which are given. Honestly, I do not know how to do this without using Mathematica. We use the PowerExpand function on our likelihood of p, which is defined as our origional joint PMF. Then we use the solve function to solve for p when the derivative of our pdf is equal to 0. This gives us $$p = \frac{2n_1 + n_2}{2(n_1+n_2+n_3)}$$.
+
+(e) Find the MLE of $p$ if we can only observe the phenotypes, not genotypes.
+
+This question relates to part (b) where we couldn't tell AA and Aa apart. Using the same approach as part (d) but with our binomial distribution from (b), $\text{Bin}(n, (1-p)^2)$, we can maximize our PMF for some value of $p$ by taking the derivative of our PMF, $f_k=\binom{n}{k}(p^2+2p(1-p))^k((1-p)^2)n-k$, and setting p equal to 0. Mathematica gives us back: $$p=1,p=0,p=2,p=1-\sqrt{\frac{k}{n}}, p=1+\sqrt{\frac{k}{n}}$$
+
+#### Question 72:
+
+(a) Find $c$ to make this a valid joint PDF.
+By integrating $f_{XY}$ in Mathematica, we can find $c$. $$\int^{\infty}_{-\infty}\int^{\infty}_{-\infty}ce^{-\frac{x^2}{2}-\frac{y^2}{2}}dxdy=c2\pi$$If we set this to zero, we can solve for c. This gives us $c=\frac{1}{2\pi}$.
+
+(b) What are the marginal distributions of $X$ and $Y$? Are $X$ and $Y$ independent?
+By integrating the joint PDf, $f_{XY}$, with respect to y and x seperately, in Mathematica. We get $$\int^{\infty}_{-\infty}ce^{-\frac{x^2}{2}-\frac{y^2}{2}}dy=\frac{e^{-\frac{x^2}{2}}}{\sqrt{2\pi}}$$
+$$\text{and}$$
+$$\int^{\infty}_{-\infty}ce^{-\frac{x^2}{2}-\frac{y^2}{2}}dx=\frac{e^{-\frac{y^2}{2}}}{\sqrt{2\pi}}$$
+After guessing and checking a bit, I could not find a specfic set of x and y values that did not equate in the equation $F_{XY}=F_XF_Y$. Luckily, Mathematica lets us use a boolean equation that returns true or false when checking all cases. It returned true, which signifies that $X$ and $Y$ are in fact independent.
+
+(c) Because we proved in (b) that the marginal distributions are independent and normally distributing, meaning they are i.i.d, we also know that the sum of two independent Normals is Normal. This tells us that (X,Y) is in fact Bivariate Normal.
+
+
+
