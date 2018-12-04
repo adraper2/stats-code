@@ -1,0 +1,25 @@
+---
+title: "MTH 341 - HW10"
+author: "Aidan Draper"
+date: "11/27/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 10
+Page 454: #17, 25
+
+#### Question 17:
+Let $X_1, X_2,...$ be i.i.d. positive random variables with mean 2. Let $Y_1, Y_2,...$ be i.i.d. positive random variables with mean 3. Show that $$\frac{X_1+X_2+...+X_n}{Y_1+Y_2+...+Y_n}\rightarrow \frac{2}{3}$$with probability 1. Does it matter whether the $X_i$ are independent of the $Y_j$?
+
+We know that by strong Law of Large Numbers, that $P(\lim_{n \to \infty}\bar{x}=E(x)=2)=1$ and $P(\lim_{n \to \infty}\bar{y}=E(y)=3)=1$ with a probability of 1. Therefore, we also know that $$\lim_{n \to \infty}\frac{\sum^n_{k=1}x_{k/n}}{\sum^n_{k=1}y_{k/n}}=\frac{2}{3}$$but we can get rid of the $k$ using algebra such that $$\lim_{n \to \infty}\frac{\sum^n_{k=1}x_{k/n}}{\sum^n_{k=1}y_{k/n}}=\frac{2}{3} \Leftrightarrow \lim_{n \to \infty}\frac{\bar{x}_n}{\bar{y}_n}=\frac{2}{3}.$$Finally, we know that if the last equation is true, that we can seperate the limits to $\bar{x}_n$ and $\bar{y}_n$ so that we have shown $\frac{X_1+X_2+...+X_n}{Y_1+Y_2+...+Y_n}\rightarrow \frac{2}{3}$ as follows:$$\lim_{n \to \infty}\frac{\bar{x}_n}{\bar{y}_n}=\frac{2}{3}\Leftrightarrow \frac{\lim_{n \to \infty}\bar{x}_n}{\lim_{n \to \infty}\bar{y}_n}=\frac{2}{3},$$ which is equivalent to $\frac{X_1+X_2+...+X_n}{Y_1+Y_2+...+Y_n}\rightarrow \frac{2}{3}$ because the means of these values are equivalent to the numerators and denominators of the fraction we are trying to prove. These events occur with a probability of 1. It should not matter whether they are dependent or indenpendent because they will always converge on their expected values as n approaches infinity.
+
+#### Question 25:
+Show that if there are $n$ of these frequentists, then the fraction of their intervals which contain the corresponding parameter approaches 0.95 as $n\rightarrow \infty$.
+
+If we use the hint and declare that our indicator r.v. $I_j$ represents the jth time that our true parameter $\theta$ is found within our CI $P(L(X)<\theta < U(X))$, then we can use the strong Law of Large Numbers to say in general:
+$$\lim_{n\rightarrow \infty}\bar{Y}_n=\mu_y \text{ with a probability of 1.}$$In our case, $$\lim_{n\rightarrow \infty}\bar{I}_n=\frac{\text{\# of times }\theta \text{ in interval}}{n}=\frac{0+1+1+1+0+...}{n}=\text{fraction of correct CIs}$$and $\bar{I}_n$ converges on $\text{E}(I_n)=\text{E}(I)$ with a probability of 1. We know from earlier chapters that the expected value of a indicator random variable is just its probability of a successful event, which is 0.95 in our case.
+

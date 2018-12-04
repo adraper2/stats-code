@@ -1,0 +1,80 @@
+---
+title: "Project 3"
+author: "Aidan Draper"
+date: "11/27/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Summary
+The second project concerned itself with Hypothesis Tests, wherein sample data is used to test claims about population parameters such as whether or not $\mu = 7.0$. In doing so we developed a decision process based on our knowledge of probability: if $\mu = 7$ were true, then we knew the probability distribution $(T)$ for a function of our sample data, and could evaluate how likely or unlikely our sample was.
+
+A related but different process involves using sample data to estimate population parameters. You will use the summary data from your second project to estimate the population mean pH for the lake.
+
+As with the previous project, your work should be clear to someone who has not read the assignment.
+
+
+# Sections of Project
+First, some notation. In your previous project, you found two boundary values for $T$ such that there was a $5\%$ chance that $T$ was outside them (with $2.5\%$ probability on the left and the right of the boundaries). Let $T_{0.025}$ be the positive boundary that you found.
+
+Your work with Mathematica helped you to find $T_{0.025}$ such that $P(-T_{0.025} \leq T \leq T_{0.025}) = 95\%$.
+
+1. Replace $T$ by the formula for it in terms of $\bar{X}_n$, $\mu$, $s$, and $n$ in the event listed above. Algebraically solve for an interval for $\mu$ that has a $95\%$ chance of containing $\mu$, then compute that interval using the sample data from Project $\#2$. \hfill \break You have just computed a $95\%$ \textit{confidence interval}; an interval used to estimate $\mu$ that has a 95% probability of containing $\mu$. The probability $95\%$ is referred to as the confidence level of the estimate.
+
+2. Repeat your computation to find a 99% confidence interval for $\mu$. You will need to use Mathematica to compute $T_{0.005}$ in a way that is similar to how you computed $T_{0.025}$.
+
+3. Explain in detail how increasing the confidence level affected the size of the interval. Does this make the interval more or less useful in estimating $\mu$?
+
+4.  If the sample were taken again and again and again, describe what would happen to the 95% confidence interval. What would change with each sample? What does the 95% likelihood mean about each sample?
+
+\clearpage
+
+## Introduction
+As we saw in Project 2, we were able to reason whether or not it would be likely for our sample pH scores from our lake of interest to belong to a population of pH levels that had a mean of 7.0 by using a T-test finding its associated T-score based on our random variable, $T$. Of course, we found our sample to not support that null hypothesis of 7.0 and, instead, it suggested that we might expect something different. So what if we were interested in what population mean pH levels values we might expect from our sample? This brings us to the confidence interval; the most used interval is the 95% confidence interval. We will spend the next section discussing what this interval looks like in theory and in the context of our lake's pH scores.
+
+## Discussion
+
+To find our confidence interval revolving around our pH level sample mean, $\bar{X}_n$, we need to find the bounds of the error of our estimation associated with that interval. These bounds are computed using $T$, $s$, and $n$. Our sample mean, with the calculated bounds subtracted and added from both sides of the sample mean, will effectively give us a 95% confidence interval for our lake pH scores sample. As it turns out, we can use algebra to manipulate the formula we used to find our critical values in project 2, $\text{Critical value}=\frac {\bar x - \mu} {s /\sqrt n}=\frac{\bar x-7.0}{0.3/\sqrt{100}}=\pm1.96$ to find our confidence interval. By multiplying both sides by $s/\sqrt{n}$ and then, adding $\bar{x}$ to both sides, we get a new formula: $$\text{CI} = \bar{X}_n\pm T^{*}(\frac{s}{\sqrt n})$$which will be the formula we use to calculate our confidence intervals. You may have noticed that in the process of finding this formula, $\mu$ ultimately became "CI". This is because there is some error to our prediction based on our sample and its size. We can never say exactly what our population parameter is from a sample, but we can predict a fairly accurate range that it may usually fall within. This follows the same foundational principles of using cumulative density functions of continuous random variables, which we describe briefly in projects 1 and 2.
+
+Normally, we could use the z-score associated with a normal distribution if we just knew what our population standard deviation was. However, we do not. Therefore, our population standard deviation now follows its own random variable, $T$, when sampling from it, which is why we have to carry out the t-test from project 2. Once we have the critical value from the test though, we can simply rearrange the confidence interval to be in terms of $\bar{X}_n$ as we did above.
+
+In R, we can now calculate this confidence interval using the statistics from our pH lake sample.
+
+``` {r part1}
+x.bar <- 6.83
+null.mean <- 7
+std <- 0.3
+n <- 100
+critical.value <- 1.984217
+
+bound <- critical.value * std/sqrt(n)
+
+cat("We are 95% confident that the true population mean pH level for the lake of", 
+    "interest\nfalls within the pH levels of", x.bar - bound,"and" ,x.bar + bound)
+```
+
+
+Additionally, we can recalculate our confidence interval with 99% confidence using a new critical value for $T^*$. We did this in the previous project using the `qt()` function in R rather easily. 
+``` {r part2}
+a <- 0.01
+critical.value2 <- abs(qt(p=1-a/2, df=99))
+
+bound <- critical.value2 * std/sqrt(n)
+
+cat("We are 99% confident that the true population mean pH level for the lake of", 
+    "interest\nfalls within the pH levels of", x.bar - bound,"and" ,x.bar + bound)
+```
+
+As you can see, increasing the confidence level significantly increased the size of the interval. This is because we want to be more confident that our true population will be in our interval when repeating the test over and over again. The interval is safer because you are less likely to perform a Type I error, which is when you find significant results even though you should not have. That being said, one drawback is that you lose precision in the interval because you have a greater margin for catching potential error. As we mentioned before, this relates to foundational concepts surrounding CDFs of random variables. By increasing our confidence level, we are increasing the range of the CDF of our r.v. $T$ so that we have captured more of the potential population mean pH levels of the lake.
+
+Additionally, if we were to continue sampling from the population, our variable $n$ is changing because it is growing larger and larger. As $n$ increases, our interval converges on our true population mean. In general, our t-score gets smaller and smaller and will enventually converge on the z-score for a standard normal distribution as n increases as well. As a result, our bounds on our error of estimation would also decrease, meaning our 95% conifidence interval would get smaller, because we were more confident about where our true population parameter would fall. 
+
+The more we sample from a population the more information we gather about the true population. We could represent an interval generated from a new sample as an indicator random variable, $I_j$, which represents successfully capturing your the true population mean, $\mu$, as a 1 (a success) and failing to do so with a 0 (a failure). The strong Law of Large Numbers says that as $n$ grows our sample mean, $\bar{X}_n$, will converge on the population mean, $\mu$. These indicator random variables will also show us that,  as we count our successful trials after sampling over and over agiain, we will end up with a ratio of successful trials over $n$ number of trials, which converges on a probability of 0.95 as $n$ appraoches infinity. Essentially, with a 95% confidence interval, we can expect that we will successfully capture our true population mean pH level of the lake about 95% of the time in our confidence intervals when repeatedly sampling.
+
+## Conclusion
+As we mentioned previously, we can use confidence intervals to generalize a range that our population mean pH level may fall within. Our ability to do so is because of random variables and their associated cumulative density functions. We saw that, as we captured a greater range of our cumulative density function by increasing our confidence level, our interval also grew larger. Lastly, we discussed what happens if we were to keep drawing samples and calculating confidence intervals, which did a nice job explaining what a "95%" confidence level really means in our the case of our problem. All of this helps explain the relevancy and usefulness of statistics and probability in performing experiments and sampling in a broad domain of other sciences. 
+
+
